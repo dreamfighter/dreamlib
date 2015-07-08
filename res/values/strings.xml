@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="df_notif_description">Notification</string>
+    <string name="df_load_more">Load More</string>
+    <string name="df_username">Username</string>
+    <string name="df_password">Password</string>
+    <string name="df_signin">SignIn</string>
+    <string name="df_cancel">Cancel</string>
+    <string name="df_proxy_auth">Enter Proxy Authentication</string>
+</resources>
