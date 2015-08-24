@@ -16,6 +16,7 @@
 	        android:scaleType="center"
 	        android:contentDescription="@string/df_proxy_auth" />
 	    <TextView
+	        android:id="@+id/label_textview"
 	    	android:textColor="#FF000000"
 	        android:layout_width="wrap_content"
 	        android:layout_height="wrap_content"

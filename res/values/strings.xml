@@ -6,5 +6,5 @@
     <string name="df_password">Password</string>
     <string name="df_signin">SignIn</string>
     <string name="df_cancel">Cancel</string>
-    <string name="df_proxy_auth">Enter Proxy Authentication</string>
+    <string name="df_proxy_auth">Enter %1$s Proxy Authentication</string>
 </resources>
