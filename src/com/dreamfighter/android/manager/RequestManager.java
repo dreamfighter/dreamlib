@@ -58,6 +58,7 @@ import android.os.Build;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import com.dreamfighter.android.R;
 import com.dreamfighter.android.entity.ProxyConfiguration;
@@ -240,6 +241,9 @@ public class RequestManager {
         View view = inflater.inflate(R.layout.df_proxy_auth_layout, null, false);
         final EditText username = (EditText)view.findViewById(R.id.df_username);
         final EditText password = (EditText)view.findViewById(R.id.df_password);
+        
+        TextView textViewLabel = (TextView) view.findViewById(R.id.label_textview);
+        textViewLabel.setText(getContext().getString(R.string.df_proxy_auth,proxyAddress));
         // Inflate and set the layout for the dialog
         // Pass null as the parent view because its going in the dialog layout
         builder.setView(view)

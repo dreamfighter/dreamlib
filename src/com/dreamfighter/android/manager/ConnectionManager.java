@@ -10,6 +10,8 @@ import org.apache.http.message.BasicNameValuePair;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 
 import com.dreamfighter.android.enums.ActionMethod;
 import com.dreamfighter.android.enums.ContentType;
@@ -40,6 +42,23 @@ public class ConnectionManager{
     
     public ConnectionManager(Context context) {
         this.context = context;
+    }
+    
+    public boolean isOnline(Context __context){
+        try {
+            ConnectivityManager __cm = (ConnectivityManager)__context.getSystemService((Context.CONNECTIVITY_SERVICE));
+            NetworkInfo __ni = __cm.getActiveNetworkInfo();
+            int __netType = __ni.getType();
+            if (__ni!=null && __ni.isConnected()){
+                if (__netType==ConnectivityManager.TYPE_WIFI 
+                        || __netType==ConnectivityManager.TYPE_MOBILE){
+                    return true;
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
     }
     
     /**

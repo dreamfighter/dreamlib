@@ -13,15 +13,6 @@ import com.dreamfighter.android.log.Logger;
 import com.dreamfighter.android.manager.RequestManager.RequestListeners;
 import com.dreamfighter.android.utils.CommonUtils;
 
-/**
- * used for caching image from server, manage it with time to life cache
- * the default time to life is one hour (3600 x 1000) millisecond
- * 
- * it used listener so set listener first if you want get the bitmap
- * 
- * @author fitra.adinugraha
- *
- */
 
 public class ImageCacheManager implements RequestListeners{
     /*
@@ -35,7 +26,7 @@ public class ImageCacheManager implements RequestListeners{
     private ConcurrentLinkedQueue<ImageRequest> linkedQueue = new ConcurrentLinkedQueue<ImageRequest>();
     private ImageCacheListener imageCacheListener;
     private ImageRequest currImgRequest = null;
-    private boolean limited = true;
+    private boolean limitless = false;
     private boolean refresh = false;
     private Object currentDisplay = new Object();
 
@@ -48,11 +39,6 @@ public class ImageCacheManager implements RequestListeners{
         }
     }
     
-    /**
-     * listener interface create implements from this interface to get callback from this class
-     * @author fitra.adinugraha
-     *
-     */
     public interface ImageCacheListener{
         void onLoaded(Object obj, Bitmap bitmap, long lastUpdate);
         void onExpired(int index, long lastUpdate);
@@ -83,10 +69,7 @@ public class ImageCacheManager implements RequestListeners{
         initializeDirectory();
     }
     
-    /**
-     * initialize directory in sdcard  
-     */
-    private void initializeDirectory(){
+    public void initializeDirectory(){
         String dirStr = CommonUtils.getBaseDirectory(context);
         if(dirStr!=null && !"".equals(dirStr)){
             File dir = new File(dirStr);
@@ -96,56 +79,31 @@ public class ImageCacheManager implements RequestListeners{
         }
     }
     
-    /**
-     * removing cache by its server url
-     * @param url
-     */
-    public boolean removeCache(String url){
-        return removeCacheByLocalUrl(CommonUtils.extractFilenameFromImgUrl(url));
-    }
-    
-    /**
-     * removing cache by its local url
-     * @param url
-     */
-    public boolean removeCacheByLocalUrl(String localUrl){
+    public void removeCache(String url){
         String dirStr = CommonUtils.getBaseDirectory(context);
-        String fileName = dirStr + localUrl;
+        String fileName = dirStr + CommonUtils.extractFilenameFromImgUrl(url);
         if(fileName!=null && !"".equals(fileName)){
             File img = new File(fileName);
             if(img.exists()){
-                return img.delete();
+                img.delete();
             }
         }
-        return false;
     }
-    
-    /**
-     * requesting image url with obj index for callback listener
-     * @param obj
-     * @param url
-     */
+
     public void request(Object obj, String url) {
         String dirStr = CommonUtils.getBaseDirectory(context);
         String fileName = dirStr + CommonUtils.extractFilenameFromImgUrl(url);
         if(fileName!=null && !"".equals(fileName) && !isRefresh()){
             File img = new File(fileName);
-            if(!isLimited()){
+            if(img.exists()){
                 Bitmap bitmap = BitmapFactory.decodeFile(fileName);
+
                 if(imageCacheListener!=null){
                     imageCacheListener.onLoaded(obj, bitmap,img.lastModified());
                 }
-                return;
-            }else if(img.exists() && img.lastModified() + cacheTTL > System.currentTimeMillis()){
-                Bitmap bitmap = BitmapFactory.decodeFile(fileName);
-                if(imageCacheListener!=null){
-                    imageCacheListener.onLoaded(obj, bitmap,img.lastModified());
-                }
-                return;
-            }else{
-                Bitmap bitmap = BitmapFactory.decodeFile(fileName);
-                if(imageCacheListener!=null){
-                    imageCacheListener.onLoaded(obj, bitmap,img.lastModified());
+                
+                if(isLimitless() || img.lastModified() + cacheTTL > System.currentTimeMillis()){
+                    return;
                 }
             }
         }
@@ -211,12 +169,12 @@ public class ImageCacheManager implements RequestListeners{
         this.cacheTTL = cacheTTL;
     }
     
-    public boolean isLimited() {
-        return limited;
+    public boolean isLimitless() {
+        return limitless;
     }
 
-    public void setLimited(boolean limited) {
-        this.limited = limited;
+    public void setLimitless(boolean limitless) {
+        this.limitless = limitless;
     }
 
     public RequestManager getRequestManager() {

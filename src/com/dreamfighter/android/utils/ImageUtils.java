@@ -84,16 +84,21 @@ public class ImageUtils {
     }
     
     public static Bitmap resizeBitmap(Bitmap b,int width){
-        int srcWidth = b.getWidth();
-        int srcHeight = b.getHeight();
-        int destWidth = width;
-        int destHeight = (int)1.0 * (destWidth / srcWidth) * srcHeight; 
-        return Bitmap.createScaledBitmap(b, destWidth, destHeight, true);
+        if(b!=null){
+            int srcWidth = b.getWidth();
+            int srcHeight = b.getHeight();
+            int destWidth = width;
+            int destHeight = (int)1.0 * (destWidth / srcWidth) * srcHeight; 
+            return Bitmap.createScaledBitmap(b, destWidth, destHeight, true);
+        }
+        return b;
     }
     
     @SuppressLint("NewApi")
     public static Bitmap blurBitmap(Bitmap bitmap,Context context){
-        
+        if(bitmap==null){
+            return bitmap;
+        }
         //Let's create an empty bitmap with the same size of the bitmap we want to blur
         Bitmap outBitmap = Bitmap.createBitmap(bitmap.getWidth(), bitmap.getHeight(), Config.ARGB_8888);
         
