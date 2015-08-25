@@ -44,9 +44,26 @@ public class ConnectionManager{
         this.context = context;
     }
     
-    public boolean isOnline(Context __context){
+    public boolean isOnline(){
         try {
-            ConnectivityManager __cm = (ConnectivityManager)__context.getSystemService((Context.CONNECTIVITY_SERVICE));
+            ConnectivityManager __cm = (ConnectivityManager)context.getSystemService((Context.CONNECTIVITY_SERVICE));
+            NetworkInfo __ni = __cm.getActiveNetworkInfo();
+            int __netType = __ni.getType();
+            if (__ni!=null && __ni.isConnected()){
+                if (__netType==ConnectivityManager.TYPE_WIFI 
+                        || __netType==ConnectivityManager.TYPE_MOBILE){
+                    return true;
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+    
+    public static boolean isOnline(Context context){
+        try {
+            ConnectivityManager __cm = (ConnectivityManager)context.getSystemService((Context.CONNECTIVITY_SERVICE));
             NetworkInfo __ni = __cm.getActiveNetworkInfo();
             int __netType = __ni.getType();
             if (__ni!=null && __ni.isConnected()){
@@ -137,6 +154,40 @@ public class ConnectionManager{
         if(url!=null){
             request(this.url, requestCode);
         }
+    }
+    /**
+     * add post to request if post is true
+     * @param key <code>String</code> header key
+     * @param value <code>long</code> header value
+     */
+    public void addPostData(String key,long value){
+        addPostData(key,String.valueOf(value));
+    }
+
+    /**
+     * add post to request if post is true
+     * @param key <code>String</code> header key
+     * @param value <code>double</code> header value
+     */
+    public void addPostData(String key,double value){
+        addPostData(key,String.valueOf(value));
+    }
+
+    /**
+     * add post to request if post is true
+     * @param key <code>String</code> header key
+     * @param value <code>float</code> header value
+     */
+    public void addPostData(String key,float value){
+        addPostData(key,String.valueOf(value));
+    }
+    /**
+     * add post to request if post is true
+     * @param key <code>String</code> header key
+     * @param value <code>int</code> header value
+     */
+    public void addPostData(String key,int value){
+        addPostData(key,String.valueOf(value));
     }
     
     /**
