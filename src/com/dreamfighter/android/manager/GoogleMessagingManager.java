@@ -1,5 +1,6 @@
 package com.dreamfighter.android.manager;
 
+
 import java.io.IOException;
 
 import android.app.Activity;
@@ -28,6 +29,7 @@ public class GoogleMessagingManager {
     
     public static interface GCMListener{
         void onRegistrationSuccess(String registrationId);
+        void onRegistered(String registrationId);
     }
     
     public GoogleMessagingManager(Context context, String senderId, String appVersion, SharedPreferences prefs){
@@ -46,7 +48,7 @@ public class GoogleMessagingManager {
                 registerInBackground();
             }else{
                 if(!"".equals(regid) && gcmListener!=null){
-                    gcmListener.onRegistrationSuccess(regid);
+                    gcmListener.onRegistered(regid);
                 }
             }
             //mDisplay.setText(regid);
@@ -77,7 +79,7 @@ public class GoogleMessagingManager {
      * @return registration ID, or empty string if there is no existing
      *         registration ID.
      */
-    private String getRegistrationId(Context context, SharedPreferences prefs) {
+    public String getRegistrationId(Context context, SharedPreferences prefs) {
         //final SharedPreferences prefs = getGCMPreferences(context);
         String registrationId = prefs.getString(PROPERTY_REG_ID, "");
         if ("".equals(registrationId)) {

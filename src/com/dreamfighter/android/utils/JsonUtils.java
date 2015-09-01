@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -18,6 +19,20 @@ public class JsonUtils {
                 throws ClassNotFoundException, InstantiationException, IllegalAccessException, JSONException{
             Object o = jsonToClassMapping(jsonObject,classDefinition);
             return classDefinition.cast(o) ;
+        }
+        
+        @SuppressWarnings({ "rawtypes", "unchecked" })
+        public static List<?> parse(JSONArray jsonArray, Class<?> classDefinition) 
+                throws ClassNotFoundException, InstantiationException, IllegalAccessException, JSONException{
+            List list = new ArrayList();
+            
+            if(jsonArray!=null){
+                for(int i=0;i<jsonArray.length();i++){
+                    JSONObject jsonObject = jsonArray.getJSONObject(i);
+                    list.add(parse(jsonObject,classDefinition));
+                }
+            }
+            return list;
         }
         
         public static Object jsonToClassMapping(JSONObject jsonObject, Class<?> classDefinition) 
