@@ -48,4 +48,12 @@ public class DFSSLSocketFactory extends SSLSocketFactory {
     public Socket createSocket() throws IOException {
         return sslContext.getSocketFactory().createSocket();
     }
+
+    public SSLContext getSslContext() {
+        return sslContext;
+    }
+
+    public void setSslContext(SSLContext sslContext) {
+        this.sslContext = sslContext;
+    }
 }
