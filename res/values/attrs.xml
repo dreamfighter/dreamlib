@@ -6,5 +6,7 @@
       	<attr name="max" format="integer" />
       	<attr name="progressDrawable" format="integer" />
       	<attr name="customTrack" format="integer" />
+      	<attr name="circleIcon" format="reference" />
+      	<attr name="circleBackColor" format="color" />
     </declare-styleable>
 </resources>
