@@ -15,6 +15,7 @@ import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.graphics.Typeface;
+import android.os.Build;
 import android.os.Environment;
 import android.provider.Settings.Secure;
 import android.telephony.TelephonyManager;
@@ -135,5 +136,27 @@ public class CommonUtils {
               identifier = Secure.getString(context.getContentResolver(),Secure.ANDROID_ID);
         }
         return identifier.getBytes("UTF-8");
+    }
+    
+
+    
+
+    /**
+     * get IMEI or android ID from device
+     * @param context
+     * @return
+     * @throws UnsupportedEncodingException
+     */
+    public static String getDeviceModel(Context context) throws UnsupportedEncodingException{
+        String manufacturer = Build.MANUFACTURER;
+        String model = Build.MODEL;
+        if (model.startsWith(manufacturer)) {
+            return capitalizeFirstChar(model);
+        }
+        if (manufacturer.equalsIgnoreCase("HTC")) {
+            // make sure "HTC" is fully capitalized.
+            return "HTC " + model;
+        }
+        return "Unknown";
     }
 }
