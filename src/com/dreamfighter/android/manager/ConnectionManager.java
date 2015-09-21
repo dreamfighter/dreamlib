@@ -1,5 +1,6 @@
 package com.dreamfighter.android.manager;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -38,6 +39,9 @@ public class ConnectionManager{
     private List<NameValuePair> postParams = new ArrayList<NameValuePair>();
     private Map<String,String> listHeader = new HashMap<String, String>();
     private String url;
+    private boolean doUpload;
+    private File fileUpload;
+    private String fileNameUpload;
     
     
     public ConnectionManager(Context context) {
@@ -87,7 +91,7 @@ public class ConnectionManager{
      */
     public void request(String url,final int requestCode){
         RequestManager req = new RequestManager(context);
-        if(actionMethod.equals(ActionMethod.POST)){
+        if(actionMethod.equals(ActionMethod.POST) && !doUpload){
             req.setPost(true);
             req.setPostType(payloadType.getValue());
             if(payloadType.equals(PayloadType.RAW)){
@@ -100,6 +104,14 @@ public class ConnectionManager{
         req.setContentType(contentType.getValue());
         req.setRequestType(requestType);
         req.addHeadersData(listHeader);
+        
+        if(doUpload){
+            req.setFileUploadName(fileNameUpload);
+            req.setPostParams(postParams);
+            req.setPost(true);
+            req.setFileUpload(fileUpload);
+            req.setUpload(true);
+        }
         
         req.setRequestListeners(new RequestListeners() {
             
@@ -146,6 +158,16 @@ public class ConnectionManager{
     
     public void request(){
         if(url!=null){
+            request(this.url, this.hashCode());
+        }
+    }
+    
+    public void upload(String url,String fileNameUpload,File fileUpload){
+        if(url!=null){
+            this.fileNameUpload = fileNameUpload;
+            this.url = url;
+            doUpload = true;
+            this.fileUpload = fileUpload;
             request(this.url, this.hashCode());
         }
     }
