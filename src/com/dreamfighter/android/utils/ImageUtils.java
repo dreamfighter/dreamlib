@@ -94,8 +94,21 @@ public class ImageUtils {
         return b;
     }
     
-    @SuppressLint("NewApi")
+    public static Bitmap blurBitmap(Context context,Bitmap bitmap){
+        return blurBitmap(bitmap,context,25.f);
+    }
+
+    
+    public static Bitmap blurBitmap(Context context,Bitmap bitmap,float blur){
+        return blurBitmap(bitmap,context,blur);
+    }
+    
     public static Bitmap blurBitmap(Bitmap bitmap,Context context){
+        return blurBitmap(bitmap,context,25.f);
+    }
+    
+    @SuppressLint("NewApi")
+    public static Bitmap blurBitmap(Bitmap bitmap,Context context,float blur){
         if(bitmap==null){
             return bitmap;
         }
@@ -113,7 +126,7 @@ public class ImageUtils {
         Allocation allOut = Allocation.createFromBitmap(rs, outBitmap);
         
         //Set the radius of the blur
-        blurScript.setRadius(25.f);
+        blurScript.setRadius(blur);
         
         //Perform the Renderscript
         blurScript.setInput(allIn);

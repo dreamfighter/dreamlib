@@ -1,6 +1,7 @@
 package com.dreamfighter.android.utils;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -58,6 +59,25 @@ public class CommonUtils {
             return result.toString();
         }
         return str;
+    }
+    
+
+    /**
+     * get base application directory
+     * @param context
+     * @return url directory
+     */
+    public static String getCacheDirectory(Context context){
+        String state = Environment.getExternalStorageState();
+        if (state.equals(Environment.MEDIA_MOUNTED)){
+            String path = Environment.getExternalStorageDirectory() + "/Android/data/"+context.getPackageName()+"/cache/";
+            File dir = new File(path);
+            if(!dir.exists()){
+                dir.mkdirs();
+            }
+            return path;
+        }
+        else return null;
     }
     
 
@@ -137,8 +157,6 @@ public class CommonUtils {
         }
         return identifier.getBytes("UTF-8");
     }
-    
-
     
 
     /**
