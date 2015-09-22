@@ -7,12 +7,14 @@ import java.net.URL;
 import com.dreamfighter.android.log.Logger;
 
 import android.annotation.SuppressLint;
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Bitmap.Config;
 import android.graphics.Canvas;
+import android.os.Build;
 import android.os.Environment;
 import android.renderscript.Allocation;
 import android.renderscript.Element;
@@ -107,8 +109,11 @@ public class ImageUtils {
         return blurBitmap(bitmap,context,25.f);
     }
     
-    @SuppressLint("NewApi")
+    @TargetApi(Build.VERSION_CODES.KITKAT)
     public static Bitmap blurBitmap(Bitmap bitmap,Context context,float blur){
+        if (Build.VERSION.SDK_INT<Build.VERSION_CODES.KITKAT) {
+            return bitmap;
+        }
         if(bitmap==null){
             return bitmap;
         }
