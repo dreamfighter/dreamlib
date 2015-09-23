@@ -39,6 +39,12 @@ public class GoogleMessagingManager {
         this.appVersion = appVersion;
     }
     
+    public static void removeRegistrationId(SharedPreferences prefs){
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putString(PROPERTY_REG_ID, "");
+        editor.commit();
+    }
+    
     public void requestRegistrationId(){
         if (checkPlayServices()) {
             gcm = GoogleCloudMessaging.getInstance(context);

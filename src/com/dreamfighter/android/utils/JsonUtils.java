@@ -1,6 +1,7 @@
 package com.dreamfighter.android.utils;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.ParameterizedType;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -81,11 +82,19 @@ public class JsonUtils {
                         //Logger.log("JsonUtils", object.getClass().getSimpleName() + " columName = "+columName+" => String");
                         Logger.log("JsonUtils", object.getClass().getSimpleName() + " => ["+columName+","+value+"]");
                         field.set(object, value);
+                    }else if(field.getType().getName().equalsIgnoreCase("java.util.List")){
+                        ParameterizedType stringListType = (ParameterizedType) field.getGenericType();
+                        Class<?> listTypeClass = (Class<?>) stringListType.getActualTypeArguments()[0];
+                        List value = parse(jsonObject.getJSONArray(columName), listTypeClass);
+                        //Logger.log("JsonUtils", object.getClass().getSimpleName() + " columName = "+columName+" => String");
+                        Logger.log("JsonUtils", object.getClass().getSimpleName() + " => ["+columName+","+value+"]");
+                        field.set(object, value);
                     }else if(field.getType().getDeclaredFields().length>0){
                         //Logger.log("JsonUtils", object.getClass().getSimpleName() + " columName = "+columName+" => " + field.getType());
                         Object value = jsonToClassMapping(jsonObject.getJSONObject(columName),field.getType());
                         field.set(object, value);
                         Logger.log("JsonUtils", object.getClass().getSimpleName() + " => ["+columName+","+value+"]");
+                        
                     }
                     field.setAccessible(false);
                 }

@@ -101,9 +101,10 @@ public class ImageCacheManager implements RequestListeners{
                 if(imageCacheListener!=null){
                     imageCacheListener.onLoaded(obj, bitmap,img.lastModified());
                 }
-                
-                if(isLimitless() || img.lastModified() + cacheTTL > System.currentTimeMillis()){
-                    return;
+                if(!refresh){
+                    if(isLimitless() || img.lastModified() + cacheTTL > System.currentTimeMillis()){
+                        return;
+                    }
                 }
             }
         }
