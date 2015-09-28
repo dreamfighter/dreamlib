@@ -217,6 +217,7 @@ public abstract class SqliteHelper extends SQLiteOpenHelper{
 	}
 	
 	private boolean isOpen(){
+	    Logger.log("database=>"+database);
 		return database.isOpen();
 	}
 	
@@ -501,22 +502,22 @@ public abstract class SqliteHelper extends SQLiteOpenHelper{
 				if(field.getType().getName().equalsIgnoreCase("java.lang.String")){
 					String value = cursor.getString(cursor.getColumnIndex(columName));
 					//Logger.log("JsonUtils", object.getClass().getSimpleName() + " columName = "+columName+" => String");
-					Logger.log(this, object.getClass().getSimpleName() + " => ["+columName+","+value+"]");
+					//Logger.log(this, object.getClass().getSimpleName() + " => ["+columName+","+value+"]");
 					field.set(object, value);
 				}else if(field.getType().getName().equalsIgnoreCase("java.lang.Long")){
 					Long value = cursor.getLong(cursor.getColumnIndex(columName));
 					//Logger.log("JsonUtils", object.getClass().getSimpleName() + " columName = "+columName+" => String");
-					Logger.log(this, object.getClass().getSimpleName() + " => ["+columName+","+value+"]");
+					//Logger.log(this, object.getClass().getSimpleName() + " => ["+columName+","+value+"]");
 					field.set(object, value);
 				}else if(field.getType().getName().equalsIgnoreCase("java.lang.Integer")){
 					int value = cursor.getInt(cursor.getColumnIndex(columName));
 					//Logger.log("JsonUtils", object.getClass().getSimpleName() + " columName = "+columName+" => String");
-					Logger.log(this, object.getClass().getSimpleName() + " => ["+columName+","+value+"]");
+					//Logger.log(this, object.getClass().getSimpleName() + " => ["+columName+","+value+"]");
 					field.set(object, value);
 				}else if(field.getType().getName().equalsIgnoreCase("java.lang.Double")){
 					double value = cursor.getDouble(cursor.getColumnIndex(columName));
 					//Logger.log("JsonUtils", object.getClass().getSimpleName() + " columName = "+columName+" => String");
-					Logger.log(this, object.getClass().getSimpleName() + " => ["+columName+","+value+"]");
+					//Logger.log(this, object.getClass().getSimpleName() + " => ["+columName+","+value+"]");
 					field.set(object, value);
 				}else if(field.getType().getName().equalsIgnoreCase("java.lang.Boolean")){
 					Boolean value = null;
@@ -526,7 +527,7 @@ public abstract class SqliteHelper extends SQLiteOpenHelper{
 						value = false;
 					}
 					//Logger.log("JsonUtils", object.getClass().getSimpleName() + " columName = "+columName+" => String");
-					Logger.log(this, object.getClass().getSimpleName() + " => ["+columName+","+value+"]");
+					//Logger.log(this, object.getClass().getSimpleName() + " => ["+columName+","+value+"]");
 					field.set(object, value);
 				}else if(field.getType().getName().equalsIgnoreCase("java.util.Date")){
 					String value = cursor.getString(cursor.getColumnIndex(columName));
@@ -534,7 +535,7 @@ public abstract class SqliteHelper extends SQLiteOpenHelper{
 						Date dateValue = dateFormat.parse(value);
 						
 						//Logger.log("JsonUtils", object.getClass().getSimpleName() + " columName = "+columName+" => String");
-						Logger.log(this, object.getClass().getSimpleName() + " => ["+columName+","+dateValue.toString()+"]");
+						//Logger.log(this, object.getClass().getSimpleName() + " => ["+columName+","+dateValue.toString()+"]");
 						field.set(object, dateValue);
 					} catch (ParseException e) {
 						e.printStackTrace();
@@ -543,7 +544,7 @@ public abstract class SqliteHelper extends SQLiteOpenHelper{
 					listType.put(columName, field);
 				}else {
 					//if(parent!=null){
-						Logger.log("["+parentClassDefinition+","+field.getType().getName()+"]");
+						//Logger.log("["+parentClassDefinition+","+field.getType().getName()+"]");
 					//}
 					if(parentClassDefinition==null || !parentClassDefinition.getName().equalsIgnoreCase(field.getType().getName())){
 						
@@ -563,7 +564,7 @@ public abstract class SqliteHelper extends SQLiteOpenHelper{
 		        
 				field.set(object, queryHelper(classDefinition, listTypeClass, retrieveColumns(listTypeClass), classDefinition.getSimpleName().toLowerCase() + "=?",new String[]{id.toString()}));
 				field.setAccessible(false);
-				Logger.log(this, object.getClass().getSimpleName() + " => ["+key+","+id+"]");
+				//Logger.log(this, object.getClass().getSimpleName() + " => ["+key+","+id+"]");
 			}
 		}
 		return object;
@@ -637,7 +638,7 @@ public abstract class SqliteHelper extends SQLiteOpenHelper{
 						Logger.log(this, object.getClass().getSimpleName() + " => ["+columName+","+value+"]");
 					}else if(field.getType().getName().equalsIgnoreCase("java.lang.Boolean")){
 						Boolean value = (Boolean)field.get(object);
-						if(value){
+						if(value!=null && value==true){
 							values.put(columName,1);
 						}else{
 							values.put(columName,0);
@@ -876,7 +877,7 @@ public abstract class SqliteHelper extends SQLiteOpenHelper{
 		if(!isOpen()){
 			open();
 		}
-		Cursor cursor = database.query(tableName(), columns, selection, selectionArgs, null, orderBy, null);
+		Cursor cursor = database.query(tableName(), columns, selection, selectionArgs, null, null, orderBy, null);
 		List<Object> list = new ArrayList<Object>();
 		cursor.moveToFirst();
 		while (!cursor.isAfterLast()) {

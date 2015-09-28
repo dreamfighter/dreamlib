@@ -42,6 +42,7 @@ public class ImageCacheManager implements RequestListeners{
     public interface ImageCacheListener{
         void onLoaded(Object obj, Bitmap bitmap, long lastUpdate);
         void onExpired(int index, long lastUpdate);
+        void onLoadImageFailed();
     }
 
     public ImageCacheManager(Context context) {
@@ -98,7 +99,7 @@ public class ImageCacheManager implements RequestListeners{
             if(img.exists()){
                 Bitmap bitmap = BitmapFactory.decodeFile(fileName);
 
-                if(imageCacheListener!=null){
+                if(imageCacheListener!=null && bitmap!=null){
                     imageCacheListener.onLoaded(obj, bitmap,img.lastModified());
                 }
                 if(!refresh){
@@ -136,7 +137,11 @@ public class ImageCacheManager implements RequestListeners{
 
         Logger.log("linkedQueue["+this.index+"].size()=>"+linkedQueue.size());
         if(imageCacheListener!=null && currImgRequest!=null && currImgRequest.obj==currentDisplay){
-            imageCacheListener.onLoaded(currImgRequest.obj, bitmap, System.currentTimeMillis());
+            if(bitmap!=null){
+                imageCacheListener.onLoaded(currImgRequest.obj, bitmap, System.currentTimeMillis());
+            }else{
+                imageCacheListener.onLoadImageFailed();
+            }
         }
         
         ImageRequest imgRequest = linkedQueue.poll();
