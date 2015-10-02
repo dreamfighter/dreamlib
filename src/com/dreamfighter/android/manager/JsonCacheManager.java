@@ -43,6 +43,27 @@ public class JsonCacheManager {
             dir.mkdirs();
         }
     }
+    
+    public JSONObject loadJSONObjectFromCache() {
+        
+        try {
+            File file = new File(directory + fileName);
+            if (file.exists() && enableCache) {
+                String json = FileUtils.readFileToString(directory + fileName);
+                
+                
+                return new JSONObject(json);
+                
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return null;
+        
+    }
 
     public void loadJSONObject() {
         String message = null;
@@ -212,7 +233,10 @@ public class JsonCacheManager {
                                                         classDefinition));
                                 }
 
-                                FileUtils.writeStringToFile(resultString, directory + fileName);
+                                if(jsonCacheManagerListener==null || (jsonCacheManagerListener!=null && 
+                                        jsonCacheManagerListener.validateJson(jsonObject))){
+                                    FileUtils.writeStringToFile(resultString, directory + fileName);
+                                }
                                 jsonCacheManagerListener.onLoaded(jsonObject);
                             } catch (JSONException e) {
                                 e.printStackTrace();

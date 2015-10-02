@@ -94,13 +94,15 @@ public class ImageCacheManager implements RequestListeners{
     public void request(Object obj, String url) {
         String dirStr = CommonUtils.getBaseDirectory(context);
         String fileName = dirStr + CommonUtils.extractFilenameFromImgUrl(url);
-        if(fileName!=null && !"".equals(fileName) && !isRefresh()){
+        if(fileName!=null && !"".equals(fileName)){
             File img = new File(fileName);
             if(img.exists()){
                 Bitmap bitmap = BitmapFactory.decodeFile(fileName);
 
                 if(imageCacheListener!=null && bitmap!=null){
                     imageCacheListener.onLoaded(obj, bitmap,img.lastModified());
+                }else if(!refresh && imageCacheListener!=null){
+                    imageCacheListener.onLoadImageFailed();
                 }
                 if(!refresh){
                     if(isLimitless() || img.lastModified() + cacheTTL > System.currentTimeMillis()){

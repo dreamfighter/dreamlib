@@ -3,9 +3,7 @@ package com.dreamfighter.android.utils;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-
 import com.dreamfighter.android.log.Logger;
-
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.content.Context;
@@ -108,6 +106,7 @@ public class ImageUtils {
     public static Bitmap blurBitmap(Bitmap bitmap,Context context){
         return blurBitmap(bitmap,context,25.f);
     }
+    
     
     @TargetApi(Build.VERSION_CODES.KITKAT)
     public static Bitmap blurBitmap(Bitmap bitmap,Context context,float blur){

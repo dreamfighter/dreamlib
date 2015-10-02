@@ -940,9 +940,12 @@ public class RequestManager {
     public void setRequestListeners(RequestListeners requestListeners) {
         this.requestListeners = requestListeners;
     }
+    
+    @Deprecated
     public String getFileUploadName() {
         return fileUploadName;
     }
+    
     public void setFileUploadName(String fileUploadName) {
         this.fileUploadName = fileUploadName;
     }

@@ -217,7 +217,6 @@ public abstract class SqliteHelper extends SQLiteOpenHelper{
 	}
 	
 	private boolean isOpen(){
-	    Logger.log("database=>"+database);
 		return database.isOpen();
 	}
 	

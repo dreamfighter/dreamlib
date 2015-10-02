@@ -8,7 +8,7 @@ import com.dreamfighter.android.enums.RequestInfo;
 import com.dreamfighter.android.manager.ConnectionManager;
 import com.dreamfighter.android.manager.RequestManager;
 
-public class ConnectionListener{
+public class ConnectionListener implements ConnectionManager.ConnectionListener{
     public void onRequestBitmapComplete(ConnectionManager connectionManager,int requestCode,Bitmap bitmap){}
     public void onRequestRawComplete(ConnectionManager connectionManager,int requestCode,Object object){}
     public void onRequestComplete(ConnectionManager connectionManager,int requestCode,String resultString){}

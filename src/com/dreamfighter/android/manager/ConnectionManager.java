@@ -1,6 +1,7 @@
 package com.dreamfighter.android.manager;
 
 import java.io.File;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -18,6 +19,7 @@ import com.dreamfighter.android.enums.ActionMethod;
 import com.dreamfighter.android.enums.ContentType;
 import com.dreamfighter.android.enums.DownloadInfo;
 import com.dreamfighter.android.enums.PayloadType;
+import com.dreamfighter.android.enums.RequestInfo;
 import com.dreamfighter.android.enums.RequestType;
 import com.dreamfighter.android.manager.RequestManager.RequestListeners;
 import com.dreamfighter.android.manager.listeners.ConnectionListener;
@@ -43,6 +45,19 @@ public class ConnectionManager{
     private File fileUpload;
     private String fileNameUpload;
     
+    public interface ConnectionListener{
+        void onRequestBitmapComplete(ConnectionManager connectionManager,int requestCode,Bitmap bitmap);
+        void onRequestRawComplete(ConnectionManager connectionManager,int requestCode,Object object);
+        void onRequestComplete(ConnectionManager connectionManager,int requestCode,String resultString);
+        void onCustomRequest(ConnectionManager connectionManager,int requestCode,InputStream is);
+        void onRequestFailed(ConnectionManager connectionManager,int requestCode,RequestInfo info);
+       
+        void onRequestComplete(RequestManager requestManager,
+                Boolean success, Bitmap bitmap, String resultString,
+                Object ressultRaw);
+
+        void requestOnProgress(ConnectionManager connectionManager,int requestCode, Long currentDownload);
+    }
     
     public ConnectionManager(Context context) {
         this.context = context;
