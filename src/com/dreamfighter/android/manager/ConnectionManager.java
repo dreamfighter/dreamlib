@@ -105,7 +105,7 @@ public class ConnectionManager{
      * @param <code>requestCode</code> request code for specific request
      */
     public void request(String url,final int requestCode){
-        RequestManager req = new RequestManager(context);
+        final RequestManager req = new RequestManager(context);
         if(actionMethod.equals(ActionMethod.POST) && !doUpload){
             req.setPost(true);
             req.setPostType(payloadType.getValue());
@@ -133,7 +133,8 @@ public class ConnectionManager{
             @Override
             public void onRequestProgress(DownloadInfo requestInfo, Long currentDownload) {
                 if(connectionListener!=null){
-                    connectionListener.requestOnProgress(ConnectionManager.this,requestCode, currentDownload);
+                    Double total = 100.0 * currentDownload / req.getFilesize();
+                    connectionListener.requestOnProgress(ConnectionManager.this,requestCode, total.longValue());
                 }
             }
             

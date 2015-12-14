@@ -86,7 +86,7 @@ public class RequestManager {
     private String urlString;
     private String rawStringPost;
     private boolean post = false;
-    private boolean finish = false;
+    private boolean finish = true;
     private boolean success = false;
     private CookieStore cookieStore;
     private List<NameValuePair> postParams = new ArrayList<NameValuePair>();
