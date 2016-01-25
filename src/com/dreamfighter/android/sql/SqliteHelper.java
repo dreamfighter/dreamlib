@@ -343,10 +343,12 @@ public abstract class SqliteHelper extends SQLiteOpenHelper{
 						continue;
 					
 					//if object has id not null then just update that object 
-					}else if(field.getName().equalsIgnoreCase(ID) && field.get(object)!=null){
+					}
+					/*
+					else if(field.getName().equalsIgnoreCase(ID) && field.get(object)!=null){
 						return updateEntity(object);
 					}
-					
+					*/
 					if(field.getName().equalsIgnoreCase(CREATED_ON)){
 						field.set(object, new Date());
 					}else if(field.getName().equalsIgnoreCase(UPDATED_ON) || field.get(object)==null){

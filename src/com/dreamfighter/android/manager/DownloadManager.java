@@ -9,6 +9,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.CookieStore;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
@@ -23,7 +24,6 @@ import org.apache.http.NameValuePair;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.CookieStore;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
@@ -37,6 +37,12 @@ import org.apache.http.message.BasicHeader;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.protocol.HTTP;
 
+import com.dreamfighter.android.R;
+import com.dreamfighter.android.entity.ProxyConfiguration;
+import com.dreamfighter.android.enums.DownloadInfo;
+import com.dreamfighter.android.log.Logger;
+import com.dreamfighter.android.utils.HttpUtils;
+
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
@@ -49,12 +55,6 @@ import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
-
-import com.dreamfighter.android.R;
-import com.dreamfighter.android.entity.ProxyConfiguration;
-import com.dreamfighter.android.enums.DownloadInfo;
-import com.dreamfighter.android.log.Logger;
-import com.dreamfighter.android.utils.HttpUtils;
 
 public class DownloadManager extends AsyncTask<String, Integer, Boolean>{
 	public static final String TYPE_STRING 	= "string";
