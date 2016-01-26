@@ -16,25 +16,40 @@ import com.dreamfighter.android.log.Logger;
 
 public class JsonUtils {
         
-        public static <T> T parse(JSONObject jsonObject, Class<T> classDefinition) 
-                throws ClassNotFoundException, InstantiationException, IllegalAccessException, JSONException{
-            Object o = jsonToClassMapping(jsonObject,classDefinition);
+    public static <T> T parse(JSONObject jsonObject, Class<T> classDefinition){
+        Object o;
+        try {
+            o = jsonToClassMapping(jsonObject,classDefinition);
             return classDefinition.cast(o) ;
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        } catch (InstantiationException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (JSONException e) {
+            e.printStackTrace();
         }
+        return null;
+    }
+    
+    
+    public static <T> List<T> parse(JSONArray jsonArray, Class<T> classDefinition) {
+        List<T> list = new ArrayList<T>();
         
-        @SuppressWarnings({ "rawtypes", "unchecked" })
-        public static List<?> parse(JSONArray jsonArray, Class<?> classDefinition) 
-                throws ClassNotFoundException, InstantiationException, IllegalAccessException, JSONException{
-            List list = new ArrayList();
-            
-            if(jsonArray!=null){
-                for(int i=0;i<jsonArray.length();i++){
-                    JSONObject jsonObject = jsonArray.getJSONObject(i);
+        if(jsonArray!=null){
+            for(int i=0;i<jsonArray.length();i++){
+                JSONObject jsonObject;
+                try {
+                    jsonObject = jsonArray.getJSONObject(i);
                     list.add(parse(jsonObject,classDefinition));
+                } catch (JSONException e) {
+                    e.printStackTrace();
                 }
             }
-            return list;
         }
+        return list;
+    }
         
         public static Object jsonToClassMapping(JSONObject jsonObject, Class<?> classDefinition) 
                 throws ClassNotFoundException, InstantiationException, IllegalAccessException, JSONException{

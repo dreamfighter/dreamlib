@@ -34,10 +34,12 @@ public class FileCacheManager implements RequestListeners{
     private class ImageRequest{
         public Object obj;
         public String url;
+        public String dir;
         public String filename;
-        public ImageRequest(Object obj,String url,String filename){
+        public ImageRequest(Object obj,String url,String dir,String filename){
             this.obj = obj;
             this.url = url;
+            this.dir = dir;
             this.filename = filename;
         }
     }
@@ -46,6 +48,7 @@ public class FileCacheManager implements RequestListeners{
         void onLoaded(Object obj, File file, long lastUpdate);
         void onExpired(int index, long lastUpdate);
         void onLoadFailed();
+        void onLoadFailed(String message);
         void onProgress(Object obj,long currentLoaded);
         void onAllLoadComplete();
     }
@@ -53,6 +56,7 @@ public class FileCacheManager implements RequestListeners{
     public static abstract class FileLoaderListener implements CacheListener{
         public void onExpired(int index, long lastUpdate){}
         public void onLoadFailed(){}
+        public void onLoadFailed(String message){}
         public void onProgress(Object obj,long currentLoaded){}
         public void onAllLoadComplete(){}
     }
@@ -110,11 +114,15 @@ public class FileCacheManager implements RequestListeners{
         }
     }
 
-    public void request(Object obj, String url,String filename) {
-        String dirStr = CommonUtils.getBaseDirectory(context);
-        String fileName = dirStr + filename;
-        if(fileName!=null && !"".equals(fileName)){
-            File img = new File(fileName);
+    public void request(Object obj, String url,String dir, String filename) {
+        //String dirStr = CommonUtils.getBaseDirectory(context);
+        String fullname = dir + filename;
+        File directory = new File(dir); 
+        if(!directory.exists()){
+            directory.mkdirs();
+        }
+        if(fullname!=null && !"".equals(fullname)){
+            File img = new File(fullname);
             if(img.exists()){
                 
                 if(cacheListener!=null){
@@ -122,12 +130,12 @@ public class FileCacheManager implements RequestListeners{
                     ImageRequest imgRequest = linkedQueue.poll();
                     //currImgRequest = linkedQueue.peek();
                     if(imgRequest!=null){
-                        request(imgRequest.obj,imgRequest.url,imgRequest.filename);
+                        request(imgRequest.obj,imgRequest.url, imgRequest.dir, imgRequest.filename);
                     }else{
                         cacheListener.onAllLoadComplete();
                     }
                 }else if(!refresh && cacheListener!=null){
-                    cacheListener.onLoadFailed();
+                    cacheListener.onLoadFailed("");
                 }
                 if(!refresh){
                     if(isLimitless() || img.lastModified() + cacheTTL > System.currentTimeMillis()){
@@ -143,17 +151,23 @@ public class FileCacheManager implements RequestListeners{
         
         Logger.log("this.requestManager.isFinish()=>"+this.requestManager.isFinish());
         if(this.requestManager.isFinish()){
-            currImgRequest = new ImageRequest(obj, url,filename);
-            this.requestManager.setFilename(fileName);
+            currImgRequest = new ImageRequest(obj, url, dir, filename);
+            this.requestManager.setFilename(fullname);
             this.requestManager.request(url);
         }else{
-            linkedQueue.add(new ImageRequest(obj, url,filename));
+            linkedQueue.add(new ImageRequest(obj, url, dir, filename));
         }
     }
 
     public void request(Object obj, String url) {
         String fileName = CommonUtils.extractFilenameFromImgUrl(url);
         request(obj,url,fileName);
+    }
+
+
+    public void request(Object obj, String url, String fileName) {
+        String dirStr = CommonUtils.getBaseDirectory(context);
+        request(obj,url,dirStr,fileName);
     }
 
     @Override
@@ -175,19 +189,24 @@ public class FileCacheManager implements RequestListeners{
             if(requestManager.getFilename()!=null){
                 cacheListener.onLoaded(currImgRequest.obj, new File(requestManager.getFilename()), System.currentTimeMillis());
             }else{
-                cacheListener.onLoadFailed();
+                cacheListener.onLoadFailed(requestManager.getRequestInfo().getValue());
             }
+        }
+        
+        if (!success) {
+            
         }
         
         ImageRequest imgRequest = linkedQueue.poll();
         //currImgRequest = linkedQueue.peek();
         if(imgRequest!=null){
-            request(imgRequest.obj,imgRequest.url,imgRequest.filename);
+            request(imgRequest.obj,imgRequest.url,imgRequest.dir, imgRequest.filename);
         }else{
             cacheListener.onAllLoadComplete();
         }
     }
 
+    
     public CacheListener getCacheListener() {
         return cacheListener;
     }
