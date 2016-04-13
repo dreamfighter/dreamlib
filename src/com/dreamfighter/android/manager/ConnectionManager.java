@@ -21,6 +21,7 @@ import com.dreamfighter.android.enums.DownloadInfo;
 import com.dreamfighter.android.enums.PayloadType;
 import com.dreamfighter.android.enums.RequestInfo;
 import com.dreamfighter.android.enums.RequestType;
+import com.dreamfighter.android.log.Logger;
 import com.dreamfighter.android.manager.RequestManager.RequestListeners;
 import com.dreamfighter.android.manager.listeners.ConnectionListener;
 /**
@@ -95,6 +96,16 @@ public class ConnectionManager{
             e.printStackTrace();
         }
         return false;
+    }
+
+    /**
+     * print all post parameter in the request
+     * 
+     */
+    public void printPostParam(){
+        for(NameValuePair valuePair:postParams){
+            Logger.log("["+valuePair.getName()+":"+valuePair.getValue()+"]");
+        }
     }
     
     /**
