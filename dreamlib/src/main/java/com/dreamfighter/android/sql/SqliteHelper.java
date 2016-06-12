@@ -37,10 +37,9 @@ public abstract class SqliteHelper extends SQLiteOpenHelper{
 	protected String tableName;
 	protected Class<?> classDefinition;
 	protected Context context;
-	
+
 	@SuppressLint("SimpleDateFormat")
 	protected static SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
-	
 
 	public SqliteHelper(Context context,String databaseName,int databaseVersion) {
 		super(context, databaseName, null, databaseVersion);
@@ -88,37 +87,6 @@ public abstract class SqliteHelper extends SQLiteOpenHelper{
 			this.tableName = classDefinition.getSimpleName();
 			COLUMNS = generatingColumns(classDefinition,null,COLUMNS);
 			this.database = getWritableDatabase();
-			/*List<Field> fields = new ArrayList<Field>();
-			
-			fields = new LinkedList<Field>(Arrays.asList(classDefinition.getDeclaredFields()));
-			if(classDefinition.getSuperclass()!=null){
-				fields.addAll(Arrays.asList(classDefinition.getSuperclass().getDeclaredFields()));
-			}
-			
-			for(Field field:fields){
-				if(field.getName().equalsIgnoreCase("id")){
-					continue;
-				}
-				String value = "TEXT NULL";
-				if(field.getType().getName().equalsIgnoreCase("java.lang.Integer")){
-					value = "INTEGER NULL";
-				}else if(field.getType().getName().equalsIgnoreCase("java.lang.Long")){
-					value = "INTEGER NULL";
-				}else if(field.getType().getName().equalsIgnoreCase("java.lang.Double")){
-					value = "REAL NULL";
-				}else if(field.getType().getName().equalsIgnoreCase("java.lang.Float")){
-					value = "REAL NULL";
-				}else if(field.getType().getName().equalsIgnoreCase("java.util.List")){
-					continue;
-				}else if(!field.getType().getName().equalsIgnoreCase("java.util.Date")){
-					value = "INTEGER NULL";
-					String subClassName = field.getClass().getSimpleName();
-					if(!isTableExists(field.getClass().getSimpleName())){
-						database.execSQL(createDatabase());
-					}
-				}
-				COLUMNS.put(field.getName(), value);
-			}*/
 			
 			if(!isTableExists()){
 				onCreate(database);
@@ -131,6 +99,30 @@ public abstract class SqliteHelper extends SQLiteOpenHelper{
 			close();
 		}
 	}
+
+    public synchronized boolean isColumnExist(SQLiteDatabase database,String columnToCheck) {
+        if(database == null || !database.isOpen()) {
+            database = getReadableDatabase();
+        }
+        Cursor mCursor = null;
+        try {
+            // Query 1 row
+            mCursor = database.rawQuery("SELECT * FROM " + tableName + " LIMIT 0", null);
+
+            // getColumnIndex() gives us the index (0 to ...) of the column - otherwise we get a -1
+            if (mCursor.getColumnIndex(columnToCheck) != -1)
+                return true;
+            else
+                return false;
+
+        } catch (Exception Exp) {
+            // Something went wrong. Missing the database? The table?
+            Logger.log("... - existsColumnInTable", "When checking whether a column exists in the table, an error occurred: " + Exp.getMessage());
+            return false;
+        } finally {
+            if (mCursor != null) mCursor.close();
+        }
+    }
 	
 	protected String[] retrieveColumns(Class<?> classDefinition){
 		//String tableName = classDefinition.getSimpleName();
@@ -246,10 +238,14 @@ public abstract class SqliteHelper extends SQLiteOpenHelper{
 	@Override
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 		Logger.log(this, "Upgrading database from version " + oldVersion + " to "
-			+ newVersion + ", which will destroy all old data");
-		db.execSQL("DROP TABLE IF EXISTS " + tableName());
-		onCreate(db);
+			+ newVersion );
+
 	}
+
+    public void resetDB(SQLiteDatabase db){
+        db.execSQL("DROP TABLE IF EXISTS " + tableName());
+        onCreate(db);
+    }
 	
 	public abstract String tableName();
 	
