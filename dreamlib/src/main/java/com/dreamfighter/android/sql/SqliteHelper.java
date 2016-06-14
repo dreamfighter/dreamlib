@@ -184,6 +184,8 @@ public abstract class SqliteHelper extends SQLiteOpenHelper{
 			}else if(field.getType().getName().equalsIgnoreCase("java.util.List")){
 				listType.put(field.getName(), field);
 				continue;
+			}else if(field.getType().getName().contains("com.android")) {
+				continue;
 			}else{
 				value = "INTEGER NULL";
 				if(!isTableExists(field.getType().getSimpleName()) && (parentClassDefinition==null || !field.getType().getName().equalsIgnoreCase(parentClassDefinition.getName()))){
