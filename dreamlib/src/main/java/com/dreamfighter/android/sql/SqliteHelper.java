@@ -33,6 +33,7 @@ public abstract class SqliteHelper extends SQLiteOpenHelper{
 	public static final String CREATED_ON = "createdOn";
 	protected Map<String,String> COLUMNS = new HashMap<String, String>();
 	private SQLiteDatabase database;
+
 	//private boolean idAutoIncrement = true;
 	protected String tableName;
 	protected Class<?> classDefinition;
