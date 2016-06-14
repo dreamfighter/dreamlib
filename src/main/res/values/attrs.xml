@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources>
+    <declare-styleable name="dreamlib">
+      	<attr name="customFontFace" format="string"/>
+      	<attr name="progress" format="integer" />
+      	<attr name="max" format="integer" />
+      	<attr name="progressDrawable" format="integer" />
+      	<attr name="customTrack" format="integer" />
+      	<attr name="circleIcon" format="reference" />
+      	<attr name="circleBackColor" format="color" />
+    </declare-styleable>
+</resources>
