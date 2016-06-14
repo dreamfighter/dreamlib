@@ -8,7 +8,8 @@ import android.view.LayoutInflater;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 
-import id.dreamfighter.android.R;
+import com.dreamfighter.android.R;
+
 
 public class DreamProgressBar extends RelativeLayout {
     private ImageView progressDrawableImageView;

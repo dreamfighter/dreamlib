@@ -62,7 +62,8 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import id.dreamfighter.android.R;
+import com.dreamfighter.android.R;
+
 import id.dreamfighter.android.entity.ProxyConfiguration;
 import id.dreamfighter.android.enums.DownloadInfo;
 import id.dreamfighter.android.enums.RequestInfo;

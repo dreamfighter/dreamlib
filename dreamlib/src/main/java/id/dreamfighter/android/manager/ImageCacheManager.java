@@ -12,7 +12,6 @@ import id.dreamfighter.android.enums.RequestType;
 import id.dreamfighter.android.log.Logger;
 import id.dreamfighter.android.manager.RequestManager.RequestListeners;
 import id.dreamfighter.android.utils.CommonUtils;
-import id.google.android.gms.common.api.GoogleApiClient.OnConnectionFailedListener;
 
 /**
  * this cache time to live is in milisecond

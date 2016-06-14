@@ -8,11 +8,12 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.google.android.gms.gcm.GoogleCloudMessaging;
+
 import id.dreamfighter.android.log.Logger;
 import id.dreamfighter.android.utils.CommonUtils;
-import id.google.android.gms.common.ConnectionResult;
-import id.google.android.gms.common.GooglePlayServicesUtil;
-import id.google.android.gms.gcm.GoogleCloudMessaging;
 
 
 public class GoogleMessagingManager {

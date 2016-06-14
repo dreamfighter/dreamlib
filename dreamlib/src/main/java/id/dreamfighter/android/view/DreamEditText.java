@@ -5,7 +5,8 @@ import android.content.res.TypedArray;
 import android.util.AttributeSet;
 import android.widget.EditText;
 
-import id.dreamfighter.android.R;
+import com.dreamfighter.android.R;
+
 import id.dreamfighter.android.utils.CommonUtils;
 
 public class DreamEditText extends EditText{
