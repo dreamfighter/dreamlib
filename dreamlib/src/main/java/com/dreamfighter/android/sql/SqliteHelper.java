@@ -50,6 +50,7 @@ public abstract class SqliteHelper extends SQLiteOpenHelper{
 			if(!isTableExists()){
 				onCreate(database);
 			}
+            validateColumn(database);
 		} catch(SQLiteException e){
 			e.printStackTrace();
 		} catch (Exception e) {
@@ -69,6 +70,7 @@ public abstract class SqliteHelper extends SQLiteOpenHelper{
 			if(!isTableExists()){
 				onCreate(database);
 			}
+            validateColumn(database);
 		} catch(SQLiteException e){
 			e.printStackTrace();
 		} catch (Exception e) {
@@ -92,6 +94,7 @@ public abstract class SqliteHelper extends SQLiteOpenHelper{
 			if(!isTableExists()){
 				onCreate(database);
 			}
+            validateColumn(database);
 		} catch(SQLiteException e){
 			e.printStackTrace();
 		} catch (Exception e) {
@@ -99,6 +102,31 @@ public abstract class SqliteHelper extends SQLiteOpenHelper{
 		}finally{
 			close();
 		}
+	}
+
+	protected synchronized void validateColumn(SQLiteDatabase database){
+        if(database == null || !database.isOpen()) {
+            database = getReadableDatabase();
+        }
+        Cursor mCursor = null;
+        try {
+            // Query 1 row
+            mCursor = database.rawQuery("SELECT * FROM " + tableName + " LIMIT 0", null);
+
+            // getColumnIndex() gives us the index (0 to ...) of the column - otherwise we get a -1
+            for(String columnName:COLUMNS.keySet()) {
+                if (mCursor.getColumnIndex(columnName) == -1){
+                    database.execSQL("ALTER TABLE " + tableName + " ADD COLUMN " + columnName + " " + COLUMNS.get(columnName));
+                }
+            }
+
+        } catch (Exception Exp) {
+            // Something went wrong. Missing the database? The table?
+            Logger.log("... - existsColumnInTable", "When checking whether a column exists in the table, an error occurred: " + Exp.getMessage());
+
+        } finally {
+            if (mCursor != null) mCursor.close();
+        }
 	}
 
     public synchronized boolean isColumnExist(SQLiteDatabase database,String columnToCheck) {
@@ -237,6 +265,7 @@ public abstract class SqliteHelper extends SQLiteOpenHelper{
 		//close();
 	    return false;
 	}
+
 
 	@Override
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
@@ -496,10 +525,15 @@ public abstract class SqliteHelper extends SQLiteOpenHelper{
 			for(Field field:fields){
 				field.setAccessible(true);
 				String columName = field.getName();
+				//Logger.log("columName=>"+columName);
 				//TODO: load list relationship
 				if(cursor.isNull(cursor.getColumnIndex(columName)) && !field.getType().getName().equalsIgnoreCase("java.util.List")){
 					continue;
 				}
+                if(cursor.getColumnIndex(columName) == -1){
+                    Logger.error("column " + columName + " not found!");
+                    continue;
+                }
 					
 				if(field.getType().getName().equalsIgnoreCase("java.lang.String")){
 					String value = cursor.getString(cursor.getColumnIndex(columName));

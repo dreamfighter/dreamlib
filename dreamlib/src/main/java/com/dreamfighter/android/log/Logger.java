@@ -18,6 +18,14 @@ public class Logger {
 			Log.d("log_info ["+className+":"+lineNumber+"]", log);
 		}
 	}
+
+
+	public static void error(String log){
+		int lineNumber = Thread.currentThread().getStackTrace()[3].getLineNumber();
+		String className = Thread.currentThread().getStackTrace()[3].getClassName();
+        Log.e("log_info ["+className+":"+lineNumber+"]", log);
+
+	}
 	
 	public static void log(Class<?> c,String log){
 		if(enable){
