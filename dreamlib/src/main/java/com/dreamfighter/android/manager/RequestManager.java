@@ -756,6 +756,8 @@ public class RequestManager {
                                 bitmap = BitmapFactory.decodeFile(filename);
                             }catch (IOException e) {
                                 e.printStackTrace();
+                            }catch (OutOfMemoryError e) {
+                                e.printStackTrace();
                             }
                         }else{
                             bitmap = BitmapFactory.decodeStream(is);

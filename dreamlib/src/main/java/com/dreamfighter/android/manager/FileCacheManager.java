@@ -22,12 +22,12 @@ public class FileCacheManager implements RequestListeners{
     private Context context;
     private long cacheTTL = 3600 * 1000;
     private int index = 0;
+    private boolean limitless = false;
+    private boolean refresh = false;
     private RequestManager requestManager;
     private ConcurrentLinkedQueue<FileRequest> linkedQueue = new ConcurrentLinkedQueue<FileRequest>();
     private CacheListener cacheListener;
     private FileRequest currImgRequest = null;
-    private boolean limitless = false;
-    private boolean refresh = false;
     private Object currentDisplay = new Object();
 
 
@@ -48,19 +48,21 @@ public class FileCacheManager implements RequestListeners{
         void onLoaded(Object obj, File file, long lastUpdate);
         void onExpired(int index, long lastUpdate);
         void onLoadFailed();
-        void onLoadFailed(String message);
+        void onLoadFailed(Object obj,String message);
         void onProgress(Object obj,long currentLoaded);
         void onAllLoadComplete();
         void onRequest(FileRequest imgRequest);
+        void onConnectionError(Object obj);
     }
     
     public static abstract class FileLoaderListener implements CacheListener{
         public void onExpired(int index, long lastUpdate){}
         public void onLoadFailed(){}
-        public void onLoadFailed(String message){}
+        public void onLoadFailed(Object obj,String message){}
         public void onProgress(Object obj,long currentLoaded){}
         public void onAllLoadComplete(){}
         public void onRequest(FileRequest imgRequest){}
+        public void onConnectionError(Object obj){}
     }
 
     public FileCacheManager(Context context) {
@@ -116,7 +118,7 @@ public class FileCacheManager implements RequestListeners{
         }
     }
 
-    public void request(Object obj, String url,String dir, String filename) {
+    public void request(Object obj, String url, String dir, String filename) {
         //String dirStr = CommonUtils.getBaseDirectory(context);
         String fullname = dir + filename;
         File directory = new File(dir); 
@@ -140,7 +142,7 @@ public class FileCacheManager implements RequestListeners{
                         cacheListener.onAllLoadComplete();
                     }
                 }else if(!refresh && cacheListener!=null){
-                    cacheListener.onLoadFailed("");
+                    cacheListener.onLoadFailed(currImgRequest.obj,"");
                 }
                 if(!refresh){
                     if(isLimitless() || img.lastModified() + cacheTTL > System.currentTimeMillis()){
@@ -188,18 +190,20 @@ public class FileCacheManager implements RequestListeners{
             Boolean success, Bitmap bitmap, String resultString,
             Object ressultRaw) {
 
+        if (!success) {
+            if (cacheListener!=null) {
+                cacheListener.onConnectionError(currImgRequest.obj);
+            }
+        }
+
         Logger.log("linkedQueue["+this.index+"].size()=>"+linkedQueue.size());
         if(cacheListener!=null && currImgRequest!=null && currImgRequest.obj==currentDisplay){
             
             if(requestManager.getFilename()!=null){
                 cacheListener.onLoaded(currImgRequest.obj, new File(requestManager.getFilename()), System.currentTimeMillis());
             }else{
-                cacheListener.onLoadFailed(requestManager.getRequestInfo().getValue());
+                cacheListener.onLoadFailed(currImgRequest.obj,requestManager.getRequestInfo().getValue());
             }
-        }
-        
-        if (!success) {
-            
         }
         
         FileRequest imgRequest = linkedQueue.poll();
@@ -222,6 +226,10 @@ public class FileCacheManager implements RequestListeners{
 
     public int getIndex() {
         return index;
+    }
+
+    public int queueSize(){
+        return linkedQueue.size();
     }
 
     public void setIndex(int index) {
