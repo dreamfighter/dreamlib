@@ -527,13 +527,13 @@ public abstract class SqliteHelper extends SQLiteOpenHelper{
 				String columName = field.getName();
 				//Logger.log("columName=>"+columName);
 				//TODO: load list relationship
-				if(cursor.isNull(cursor.getColumnIndex(columName)) && !field.getType().getName().equalsIgnoreCase("java.util.List")){
+				if(cursor.getColumnIndex(columName) == -1){
+					//Logger.error("column " + columName + " not found!");
 					continue;
 				}
-                if(cursor.getColumnIndex(columName) == -1){
-                    Logger.error("column " + columName + " not found!");
-                    continue;
-                }
+				if(cursor.getColumnIndex(columName) != -1 && cursor.isNull(cursor.getColumnIndex(columName)) && !field.getType().getName().equalsIgnoreCase("java.util.List")){
+					continue;
+				}
 					
 				if(field.getType().getName().equalsIgnoreCase("java.lang.String")){
 					String value = cursor.getString(cursor.getColumnIndex(columName));
