@@ -4,7 +4,7 @@ import java.io.File;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import com.dreamfighter.android.enums.DownloadInfo;
-import com.dreamfighter.android.enums.RequestType;
+import com.dreamfighter.android.enums.ResponseType;
 import com.dreamfighter.android.log.Logger;
 import com.dreamfighter.android.manager.RequestManager.RequestListeners;
 import com.dreamfighter.android.utils.CommonUtils;
@@ -69,7 +69,7 @@ public class FileCacheManager implements RequestListeners{
         //super(context);
         this.context = context;
         this.requestManager = new RequestManager(context);
-        this.requestManager.setRequestType(RequestType.RAW);
+        this.requestManager.setResponseType(ResponseType.RAW);
         this.requestManager.setRequestListeners(this);
         initializeDirectory();
     }
@@ -86,7 +86,7 @@ public class FileCacheManager implements RequestListeners{
         this.context = context;
         this.index = index;
         this.requestManager = new RequestManager(context);
-        this.requestManager.setRequestType(RequestType.RAW);
+        this.requestManager.setResponseType(ResponseType.RAW);
         this.requestManager.setRequestListeners(this);
         initializeDirectory();
     }

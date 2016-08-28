@@ -1,6 +1,6 @@
 package com.dreamfighter.android.enums;
 
-public enum RequestType {
+public enum ResponseType {
 	STRING("string"),
 	BITMAP("bitmap"),
 	CUSTOM("custom"),
@@ -14,7 +14,7 @@ public enum RequestType {
 	 * @param value
 	 *            DOCUMENT ME!
 	 */
-	private RequestType(String value) {
+	private ResponseType(String value) {
 		this.value = value;
 	}
 

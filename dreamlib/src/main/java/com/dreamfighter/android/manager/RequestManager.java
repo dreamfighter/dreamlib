@@ -68,7 +68,7 @@ import com.dreamfighter.android.R;
 import com.dreamfighter.android.entity.ProxyConfiguration;
 import com.dreamfighter.android.enums.DownloadInfo;
 import com.dreamfighter.android.enums.RequestInfo;
-import com.dreamfighter.android.enums.RequestType;
+import com.dreamfighter.android.enums.ResponseType;
 import com.dreamfighter.android.log.Logger;
 import com.dreamfighter.android.utils.HttpUtils;
 
@@ -96,7 +96,7 @@ public class RequestManager {
     private List<NameValuePair> postParams = new ArrayList<NameValuePair>();
     private Boolean connection = true;
     private Bitmap bitmap = null;
-    private RequestType requestType = RequestType.STRING;
+    private ResponseType responseType = ResponseType.STRING;
     private String postType = POST_TYPE_FORM;
     private String contentType = CONTENT_TYPE_HTML;
     private String resultString = null;
@@ -155,8 +155,8 @@ public class RequestManager {
     }
     
     @SuppressLint("NewApi")
-    public void request(RequestType requestType){
-        this.requestType = requestType;
+    public void request(ResponseType responseType){
+        this.responseType = responseType;
         if(!requestTask.getStatus().equals(Status.RUNNING) && !requestTask.getStatus().equals(Status.FINISHED)){
             //requestTask.execute();
         }else{
@@ -714,10 +714,10 @@ public class RequestManager {
                         is = getContent();
                     }
                     
-                    if(requestType.equals(RequestType.CUSTOM) && customRequest!=null){
+                    if(responseType.equals(ResponseType.CUSTOM) && customRequest!=null){
                         customRequest.onRequest(is);
                         
-                    }else if(requestType.equals(RequestType.STRING)){
+                    }else if(responseType.equals(ResponseType.STRING)){
                         BufferedReader reader = new BufferedReader(new InputStreamReader(is, "iso-8859-1"), 8);
                         StringBuilder sb = new StringBuilder();
                         String line = null;
@@ -729,7 +729,7 @@ public class RequestManager {
                         is.close();
                         resultString = sb.toString();
                         
-                    }else if(requestType.equals(RequestType.BITMAP)){
+                    }else if(responseType.equals(ResponseType.BITMAP)){
                         
                         if(filename!=null){
                             try{
@@ -762,7 +762,7 @@ public class RequestManager {
                         }else{
                             bitmap = BitmapFactory.decodeStream(is);
                         }
-                    }else if(requestType.equals(RequestType.RAW)){
+                    }else if(responseType.equals(ResponseType.RAW)){
                         if(filename!=null){
                             FileOutputStream f = new FileOutputStream(filename);
     
@@ -820,11 +820,11 @@ public class RequestManager {
             
             finish = true;
             if(requestListeners!=null){
-                if(requestType.equals(RequestType.STRING)){
+                if(responseType.equals(ResponseType.STRING)){
                     requestListeners.onRequestComplete(RequestManager.this,success,null,resultString,resultString);
-                }else if(requestType.equals(RequestType.RAW)){
+                }else if(responseType.equals(ResponseType.RAW)){
                     requestListeners.onRequestComplete(RequestManager.this,success,null,null,resultString);
-                }else if(requestType.equals(RequestType.BITMAP)){
+                }else if(responseType.equals(ResponseType.BITMAP)){
                     requestListeners.onRequestComplete(RequestManager.this,success,bitmap,null,bitmap);
                 }
             }
@@ -854,18 +854,18 @@ public class RequestManager {
         return bitmap;
     }
 
-    public RequestType getRequestType() {
-        return requestType;
+    public ResponseType getResponseType() {
+        return responseType;
     }
 
     /**
      * set request type if you want request result string set STRING
      * BITMAP if you want request image and RAW for another type
-     * @see RequestType
-     * @param requestType
+     * @see ResponseType
+     * @param responseType
      */
-    public void setRequestType(RequestType requestType) {
-        this.requestType = requestType;
+    public void setResponseType(ResponseType responseType) {
+        this.responseType = responseType;
     }
 
     public String getResultString() {
@@ -963,9 +963,9 @@ public class RequestManager {
          * 
          * @param requestManager
          * @param success <code>Boolean</code> true if request completely retrieve and false if there is any problem in request
-         * @param bitmap <code>Bitmap</code> if you set RequestType BITMAP result will be in the bitmap parameter
-         * @param resultString <code>String</code>  if you set RequestType STRING result will be in the resultString
-         * @param ressultRaw <code>Object</code> if you set RequestType RAW result will be in the resultRaw parameter
+         * @param bitmap <code>Bitmap</code> if you set ResponseType BITMAP result will be in the bitmap parameter
+         * @param resultString <code>String</code>  if you set ResponseType STRING result will be in the resultString
+         * @param ressultRaw <code>Object</code> if you set ResponseType RAW result will be in the resultRaw parameter
          */
         public void onRequestComplete(RequestManager requestManager, Boolean success, Bitmap bitmap, String resultString, Object ressultRaw);
     }

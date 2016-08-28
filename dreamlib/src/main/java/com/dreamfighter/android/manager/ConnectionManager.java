@@ -21,10 +21,9 @@ import com.dreamfighter.android.enums.ContentType;
 import com.dreamfighter.android.enums.DownloadInfo;
 import com.dreamfighter.android.enums.PayloadType;
 import com.dreamfighter.android.enums.RequestInfo;
-import com.dreamfighter.android.enums.RequestType;
+import com.dreamfighter.android.enums.ResponseType;
 import com.dreamfighter.android.log.Logger;
 import com.dreamfighter.android.manager.RequestManager.RequestListeners;
-import com.dreamfighter.android.manager.listeners.ConnectionListener;
 import com.dreamfighter.android.utils.JsonUtils;
 
 /**
@@ -36,7 +35,7 @@ import com.dreamfighter.android.utils.JsonUtils;
 public class ConnectionManager{
     private Context context;
     private ConnectionListener connectionListener;
-    private RequestType requestType = RequestType.STRING;
+    private ResponseType responseType = ResponseType.STRING;
     private PayloadType payloadType = PayloadType.FORM;
     private ContentType contentType = ContentType.APPLICATION_JSON;
     private ActionMethod actionMethod = ActionMethod.GET;
@@ -48,6 +47,8 @@ public class ConnectionManager{
     private boolean doUpload;
     private File fileUpload;
     private String fileNameUpload;
+    private String fileName;
+    private boolean secure = true;
     
     public interface ConnectionListener{
         void onRequestBitmapComplete(ConnectionManager connectionManager,int requestCode,Bitmap bitmap);
@@ -60,7 +61,7 @@ public class ConnectionManager{
                 Boolean success, Bitmap bitmap, String resultString,
                 Object ressultRaw);
 
-        void requestOnProgress(ConnectionManager connectionManager,int requestCode, Long currentDownload);
+        void requestOnProgress(ConnectionManager connectionManager,int requestCode, double currentDownload);
     }
     
     public ConnectionManager(Context context) {
@@ -118,7 +119,7 @@ public class ConnectionManager{
      * @param <code>url</code> server url that you want to request
      * @param <code>requestCode</code> request code for specific request
      */
-    public void request(String url,final int requestCode){
+    public RequestManager request(String url,final int requestCode){
         final RequestManager req = new RequestManager(context);
         if(actionMethod.equals(ActionMethod.POST) && !doUpload){
             req.setPost(true);
@@ -129,10 +130,16 @@ public class ConnectionManager{
                 req.setPostParams(postParams);
             }
         }
-        req.setSecure(true);
+        req.setSecure(secure);
         req.setContentType(contentType.getValue());
-        req.setRequestType(requestType);
+        req.setResponseType(responseType);
         req.addHeadersData(listHeader);
+
+        if(responseType.equals(ResponseType.RAW) && fileName==null){
+            Logger.error("WARNING: file name for raw response is null");
+        }
+
+        req.setFilename(fileName);
         
         if(doUpload){
             req.setFileUploadName(fileNameUpload);
@@ -147,8 +154,8 @@ public class ConnectionManager{
             @Override
             public void onRequestProgress(DownloadInfo requestInfo, Long currentDownload) {
                 if(connectionListener!=null){
-                    Double total = 100.0 * currentDownload / req.getFilesize();
-                    connectionListener.requestOnProgress(ConnectionManager.this,requestCode, total.longValue());
+                    double total = (100.0 * currentDownload) / req.getFilesize();
+                    connectionListener.requestOnProgress(ConnectionManager.this,requestCode, total);
                 }
             }
             
@@ -156,14 +163,14 @@ public class ConnectionManager{
             public void onRequestComplete(RequestManager requestManager,
                     Boolean success, Bitmap bitmap, String resultString,
                     Object ressultRaw) {
-                RequestType type = requestManager.getRequestType();
+                ResponseType type = requestManager.getResponseType();
                 if(connectionListener!=null){
                     if(success){
-                        if(type.equals(RequestType.BITMAP)){
+                        if(type.equals(ResponseType.BITMAP)){
                             connectionListener.onRequestBitmapComplete(ConnectionManager.this,requestCode,bitmap);
-                        }else if(type.equals(RequestType.STRING)){
+                        }else if(type.equals(ResponseType.STRING)){
                             connectionListener.onRequestComplete(ConnectionManager.this,requestCode,resultString);
-                        }else if(type.equals(RequestType.RAW)){
+                        }else if(type.equals(ResponseType.RAW)){
                             connectionListener.onRequestRawComplete(ConnectionManager.this,requestCode,ressultRaw);
                         }
                     }else{
@@ -174,6 +181,7 @@ public class ConnectionManager{
             }
         });
         req.request(url);
+        return req;
     }
     
     /**
@@ -182,14 +190,15 @@ public class ConnectionManager{
      * 
      * @param <code>url</code> server url that you want to request
      */
-    public void request(String url){
-        request(url, this.hashCode());
+    public RequestManager request(String url){
+        return request(url, this.hashCode());
     }
     
-    public void request(){
+    public RequestManager request(){
         if(url!=null){
-            request(this.url, this.hashCode());
+            return request(this.url, this.hashCode());
         }
+        return null;
     }
     
     public void upload(String url,String fileNameUpload,File fileUpload){
@@ -202,10 +211,11 @@ public class ConnectionManager{
         }
     }
     
-    public void request(int requestCode){
+    public RequestManager request(int requestCode){
         if(url!=null){
-            request(this.url, requestCode);
+            return request(this.url, requestCode);
         }
+        return null;
     }
     /**
      * add post to request if post is true
@@ -277,12 +287,12 @@ public class ConnectionManager{
         this.connectionListener = connectionListener;
     }
 
-    public RequestType getRequestType() {
-        return requestType;
+    public ResponseType getResponseType() {
+        return responseType;
     }
 
-    public void setRequestType(RequestType requestType) {
-        this.requestType = requestType;
+    public void setResponseType(ResponseType responseType) {
+        this.responseType = responseType;
     }
 
     public PayloadType getPayloadType() {
@@ -342,4 +352,11 @@ public class ConnectionManager{
         this.url = url;
     }
 
+    public void setSecure(boolean secure) {
+        this.secure = secure;
+    }
+
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
+    }
 }

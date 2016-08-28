@@ -21,8 +21,7 @@ public class ConnectionListener implements ConnectionManager.ConnectionListener{
         
     }
 
-    public void requestOnProgress(ConnectionManager connectionManager,int requestCode, Long currentDownload) {
+    public void requestOnProgress(ConnectionManager connectionManager,int requestCode, double currentDownload) {
         // TODO Auto-generated method stub
-        
     }
 }

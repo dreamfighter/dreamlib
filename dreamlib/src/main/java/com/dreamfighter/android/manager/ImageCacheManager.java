@@ -8,11 +8,10 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 
 import com.dreamfighter.android.enums.DownloadInfo;
-import com.dreamfighter.android.enums.RequestType;
+import com.dreamfighter.android.enums.ResponseType;
 import com.dreamfighter.android.log.Logger;
 import com.dreamfighter.android.manager.RequestManager.RequestListeners;
 import com.dreamfighter.android.utils.CommonUtils;
-import com.google.android.gms.common.api.GoogleApiClient.OnConnectionFailedListener;
 
 /**
  * this cache time to live is in milisecond
@@ -60,6 +59,7 @@ public class ImageCacheManager implements RequestListeners{
         public void onExpired(int index, long lastUpdate){}
         public void onLoadImageFailed(){}
         public void onImageProgress(long currentLoaded){}
+        public void onImageProgress(Object obj,double currentLoaded){}
         public void onConnectionError(){}
     }
 
@@ -67,7 +67,7 @@ public class ImageCacheManager implements RequestListeners{
         //super(context);
         this.context = context;
         this.requestManager = new RequestManager(context);
-        this.requestManager.setRequestType(RequestType.BITMAP);
+        this.requestManager.setResponseType(ResponseType.BITMAP);
         this.requestManager.setRequestListeners(this);
         initializeDirectory();
     }
@@ -84,7 +84,7 @@ public class ImageCacheManager implements RequestListeners{
         this.context = context;
         this.index = index;
         this.requestManager = new RequestManager(context);
-        this.requestManager.setRequestType(RequestType.BITMAP);
+        this.requestManager.setResponseType(ResponseType.BITMAP);
         this.requestManager.setRequestListeners(this);
         initializeDirectory();
     }
