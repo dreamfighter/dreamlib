@@ -950,9 +950,9 @@ public class RequestManager {
          * 
          * @param requestManager
          * @param success <code>Boolean</code> true if request completely retrieve and false if there is any problem in request
-         * @param bitmap <code>Bitmap</code> if you set RequestType BITMAP result will be in the bitmap parameter
-         * @param resultString <code>String</code>  if you set RequestType STRING result will be in the resultString
-         * @param ressultRaw <code>Object</code> if you set RequestType RAW result will be in the resultRaw parameter
+         * @param bitmap <code>Bitmap</code> if you set ResponseType BITMAP result will be in the bitmap parameter
+         * @param resultString <code>String</code>  if you set ResponseType STRING result will be in the resultString
+         * @param ressultRaw <code>Object</code> if you set ResponseType RAW result will be in the resultRaw parameter
          */
         public void onRequestComplete(RequestManager requestManager, Boolean success, Bitmap bitmap, String resultString, Object ressultRaw);
     }

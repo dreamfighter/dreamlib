@@ -6,6 +6,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.UnknownHostException;
 import java.security.KeyManagementException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
@@ -331,7 +332,7 @@ public class RequestManager {
      * @throws IllegalStateException
      * @throws IOException
      */
-    public InputStream getContent() throws IllegalStateException, IOException, NullPointerException{
+    public InputStream getContent() throws IllegalStateException, IOException, NullPointerException, UnknownHostException{
         
         Logger.log(this, "DOWNLOAD CONTENT USING GET URL => " + getUrlString());
         
@@ -434,7 +435,7 @@ public class RequestManager {
      * @throws ClientProtocolException
      * @throws IOException
      */
-    public InputStream post() throws ClientProtocolException, IOException{
+    public InputStream post() throws ClientProtocolException, IOException, UnknownHostException{
         Logger.log(this, "DOWNLOAD CONTENT USING POST URL => " + getUrlString());
 
         DefaultHttpClient httpClient = new DefaultHttpClient();

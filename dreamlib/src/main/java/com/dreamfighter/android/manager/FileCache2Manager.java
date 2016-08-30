@@ -32,7 +32,7 @@ public class FileCache2Manager {
     private Map<String,Integer> state = new ConcurrentHashMap<String,Integer>();
 
     private Map<Object,RequestManager> fileCaches = new HashMap<Object,RequestManager>();
-    private Map<Object,ImageCacheManager.ImageLoaderListener> cacheListener = new HashMap<Object,ImageCacheManager.ImageLoaderListener>();
+    private Map<Object,FileCacheManager.FileLoaderListener> cacheListener = new HashMap<Object,FileCacheManager.FileLoaderListener>();
     //private FileCacheManager.FileLoaderListener listener;
 
     public class FileRequest{
@@ -69,7 +69,7 @@ public class FileCache2Manager {
         }
     }
 
-    public FileCache2Manager addListener(Object obj,ImageCacheManager.ImageLoaderListener listener){
+    public FileCache2Manager addListener(Object obj,FileCacheManager.FileLoaderListener listener){
         cacheListener.put(obj,listener);
         return this;
     }
@@ -87,11 +87,11 @@ public class FileCache2Manager {
 
         if(!refresh) {
             if (localState!=null && localState == LOADED && file.exists()) {
-                ImageCacheManager.ImageLoaderListener listener = cacheListener.get(obj);
+                FileCacheManager.FileLoaderListener listener = cacheListener.get(obj);
 
                 if(listener!=null){
 
-                    listener.onLoaded(obj,BitmapFactory.decodeFile(fullName),file.lastModified());
+                    listener.onLoaded(obj,file,file.lastModified());
                 }
                 cacheListener.remove(obj);
                 return;
@@ -102,11 +102,11 @@ public class FileCache2Manager {
             }
             if (file.exists()) {
                 state.put(fileName, LOADED);
-                ImageCacheManager.ImageLoaderListener listener = cacheListener.get(obj);
+                FileCacheManager.FileLoaderListener listener = cacheListener.get(obj);
 
                 if(listener!=null){
 
-                    listener.onLoaded(obj,BitmapFactory.decodeFile(fullName),file.lastModified());
+                    listener.onLoaded(obj,file,file.lastModified());
                 }
                 cacheListener.remove(obj);
                 return;
@@ -118,14 +118,14 @@ public class FileCache2Manager {
             ConnectionManager conn = new ConnectionManager(context);
             conn.setActionMethod(ActionMethod.GET);
             conn.setFileName(fullName);
-            conn.setResponseType(ResponseType.BITMAP);
+            conn.setResponseType(ResponseType.RAW);
 
             conn.setConnectionListener(new ConnectionListener(){
 
-
+                /*
                 @Override
                 public void onRequestBitmapComplete(ConnectionManager connectionManager, int requestCode, Bitmap bitmap) {
-                    ImageCacheManager.ImageLoaderListener listener = cacheListener.get(requestCode);
+                    FileCacheManager.FileLoaderListener listener = cacheListener.get(requestCode);
                     state.put(fileName,LOADED);
                     if(listener!=null){
                         listener.onLoaded(requestCode,bitmap,new Date().getTime());
@@ -137,21 +137,14 @@ public class FileCache2Manager {
                         request((int)fileRequest.obj, fileRequest.url, fileRequest.filename,refresh);
                     }
                 }
-
-
-                @Override
-                public void requestOnProgress(ConnectionManager connectionManager, int requestCode, double currentDownload) {
-                    ImageCacheManager.ImageLoaderListener listener = cacheListener.get(requestCode);
-                    if(listener!=null){
-                        listener.onImageProgress(requestCode,currentDownload);
-                    }
-                }
+                */
 
                 @Override
-                public void onRequestFailed(ConnectionManager connectionManager, int requestCode, RequestInfo info) {
-                    ImageCacheManager.ImageLoaderListener listener = cacheListener.get(requestCode);
+                public void onRequestRawComplete(ConnectionManager connectionManager, int requestCode, Object object) {
+                    FileCacheManager.FileLoaderListener listener = cacheListener.get(requestCode);
+                    state.put(fileName,LOADED);
                     if(listener!=null){
-                        listener.onLoadImageFailed();
+                        listener.onLoaded(requestCode,new File(fullName),new Date().getTime());
                     }
                     fileCaches.remove(requestCode);
                     cacheListener.remove(requestCode);
@@ -160,6 +153,30 @@ public class FileCache2Manager {
                         request((int)fileRequest.obj, fileRequest.url, fileRequest.filename,refresh);
                     }
                 }
+
+                @Override
+                public void requestOnProgress(ConnectionManager connectionManager, int requestCode, double currentDownload) {
+                    FileCacheManager.FileLoaderListener listener = cacheListener.get(requestCode);
+                    if(listener!=null){
+                        listener.onProgress(requestCode,(long)currentDownload);
+                    }
+                }
+
+                @Override
+                public void onRequestFailed(ConnectionManager connectionManager, int requestCode, RequestInfo info) {
+                    FileCacheManager.FileLoaderListener listener = cacheListener.get(requestCode);
+                    if(listener!=null){
+                        listener.onLoadFailed(requestCode,info.name());
+                    }
+                    fileCaches.remove(requestCode);
+                    cacheListener.remove(requestCode);
+                    FileRequest fileRequest = linkedQueue.poll();
+                    if(fileRequest!=null){
+                        request((int)fileRequest.obj, fileRequest.url, fileRequest.filename,refresh);
+                    }
+                }
+
+
             });
             fileCaches.put(obj,conn.request(url,obj));
 
