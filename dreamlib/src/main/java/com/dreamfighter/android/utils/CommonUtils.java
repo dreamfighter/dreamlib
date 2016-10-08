@@ -21,6 +21,8 @@ import android.os.Environment;
 import android.provider.Settings.Secure;
 import android.telephony.TelephonyManager;
 
+import com.dreamfighter.android.manager.FileCache2Manager;
+
 public class CommonUtils {
     private static Map<String, Typeface> font = new HashMap<String, Typeface>();
     
@@ -102,7 +104,12 @@ public class CommonUtils {
     public static String getBaseDirectory(Context context){
         String state = Environment.getExternalStorageState();
         if (state.equals(Environment.MEDIA_MOUNTED)){
-            return Environment.getExternalStorageDirectory() + "/Android/data/"+context.getPackageName()+"/cacheImage/";
+            String dir = Environment.getExternalStorageDirectory() + "/Android/data/"+context.getPackageName()+"/cacheImage/";
+            File dirFile = new File(dir);
+            if(!dirFile.exists()){
+                dirFile.mkdirs();
+            }
+            return dir;
         }
         else return null;
     }
