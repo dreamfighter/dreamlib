@@ -15,7 +15,18 @@ public class Logger {
 		if(enable){
 			int lineNumber = Thread.currentThread().getStackTrace()[3].getLineNumber();
 			String className = Thread.currentThread().getStackTrace()[3].getClassName();
-			Log.d("log_info ["+className+":"+lineNumber+"]", log);
+			int maxLogSize = 1000;
+			if(log.length()>maxLogSize) {
+				for (int i = 0; i <= log.length() / maxLogSize; i++) {
+					int start = i * maxLogSize;
+					int end = (i + 1) * maxLogSize;
+					end = end > log.length() ? log.length() : end;
+					//android.util.Log.d(TAG, message.substring(start, end));
+					Log.d("log_info [" + className + ":" + lineNumber + "]", log.substring(start, end));
+				}
+			}else {
+				Log.d("log_info [" + className + ":" + lineNumber + "]", log);
+			}
 		}
 	}
 
