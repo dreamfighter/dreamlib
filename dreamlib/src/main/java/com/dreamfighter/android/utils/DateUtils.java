@@ -52,7 +52,7 @@ public class DateUtils extends GregorianCalendar{
     public DiffDate getDiffDate(Date date){
         Calendar cal = Calendar.getInstance();
         cal.setTimeInMillis(date.getTime());
-        long diff = cal.getTimeInMillis() - getTimeInMillis();
+        long diff = Math.abs(cal.getTimeInMillis() - getTimeInMillis());
 
         double hours =  (diff / (1000 * 60 * 60));
         double minutes = (diff / (1000 * 60));
