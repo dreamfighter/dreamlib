@@ -59,22 +59,23 @@ public class DateUtils extends GregorianCalendar{
         double seconds = (diff / 1000 );
         int diffDays =  (int) (hours / 24);
         int diffHours =  (int) (hours % 24);
-        if(seconds==1){
+
+        if((int)seconds==1){
             return new DiffDate("1", DiffType.SECOND);
-        }else if(seconds<60){
-            return new DiffDate("" + seconds, DiffType.SECOND);
-        }else if(minutes==1){
+        }else if((int)seconds<60){
+            return new DiffDate("" + (int)seconds, DiffType.SECOND);
+        }else if((int)minutes==1){
             return new DiffDate("1", DiffType.MINUTE);
-        }else if(minutes<60){
-            return new DiffDate("" + minutes, DiffType.MINUTES);
-        }else if(hours==1){
+        }else if((int)minutes<60){
+            return new DiffDate("" + (int)minutes, DiffType.MINUTES);
+        }else if((int)hours==1){
             return new DiffDate("1", DiffType.HOUR);
-        }else if(hours<24){
-            return new DiffDate("" + hours, DiffType.SECOND);
+        }else if((int)hours<24){
+            return new DiffDate("" + (int)hours, DiffType.HOURS);
         }else if(diffDays==1){
             return new DiffDate("1", DiffType.DAY);
         }else if(diffDays<31){
-            return new DiffDate("" + diffDays, DiffType.SECOND);
+            return new DiffDate("" + diffDays, DiffType.DAYS);
         }else{
             return new DiffDate("" , DiffType.DATE);
         }

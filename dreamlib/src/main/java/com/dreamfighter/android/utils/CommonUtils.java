@@ -19,6 +19,7 @@ import android.graphics.Typeface;
 import android.os.Build;
 import android.os.Environment;
 import android.provider.Settings.Secure;
+import android.support.v7.app.AlertDialog;
 import android.telephony.TelephonyManager;
 
 import com.dreamfighter.android.manager.FileCache2Manager;
@@ -209,5 +210,10 @@ public class CommonUtils {
         } else {
             return (manufacturer + " " + model).toUpperCase();
         }
+    }
+
+    public static AlertDialog showDialog(Context context, String title, String message){
+        AlertDialog.Builder ad = new AlertDialog.Builder(context);
+        return ad.setTitle(title).setMessage(message).show();
     }
 }
