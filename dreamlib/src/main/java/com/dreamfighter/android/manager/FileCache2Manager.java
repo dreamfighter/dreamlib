@@ -29,7 +29,7 @@ public class FileCache2Manager {
 
     private Context context;
     private ConcurrentLinkedQueue<FileRequest> linkedQueue = new ConcurrentLinkedQueue<FileRequest>();
-    private Map<String,Integer> state = new ConcurrentHashMap<String,Integer>();
+    private Map<String,Integer> state = new HashMap<String,Integer>();
 
     private Map<Object,RequestManager> fileCaches = new HashMap<Object,RequestManager>();
     private Map<Object,FileCacheManager.FileLoaderListener> cacheListener = new HashMap<Object,FileCacheManager.FileLoaderListener>();

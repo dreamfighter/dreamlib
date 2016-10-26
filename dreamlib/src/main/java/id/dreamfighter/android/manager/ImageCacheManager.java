@@ -1,11 +1,18 @@
 package id.dreamfighter.android.manager;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.widget.ImageView;
+
+import com.dreamfighter.android.utils.ImageUtils;
 
 import id.dreamfighter.android.enums.DownloadInfo;
 import id.dreamfighter.android.enums.RequestType;
@@ -69,6 +76,48 @@ public class ImageCacheManager implements RequestListeners{
         this.requestManager.setRequestType(RequestType.BITMAP);
         this.requestManager.setRequestListeners(this);
         initializeDirectory();
+    }
+
+    public void setThumbnail(final ImageView imageView){
+        this.requestManager.setRequestType(RequestType.CUSTOM);
+        this.requestManager.setCustomRequest(new RequestManager.CustomRequest() {
+            @Override
+            public void onRequest(InputStream is) {
+
+                try {
+
+                    FileOutputStream f = new FileOutputStream(requestManager.getFilename());
+                    //InputStream isBitmap = new ByteArrayInputStream(bytes.toByteArray());
+
+                    int readlen = 0;
+                    Long totalRead = 0l;
+                    byte[] buf = new byte[1024];
+                    while ((readlen = is.read(buf)) > 0){
+                        f.write(buf, 0, readlen);
+                        totalRead += readlen;
+                        if(imageCacheListener!=null && currImgRequest!=null && currImgRequest.obj==currentDisplay) {
+                            imageCacheListener.onImageProgress(totalRead.intValue());
+                        }
+                    }
+                    f.close();
+                    is.close();
+
+                    Bitmap bmp = ImageUtils.setImageBitmap(requestManager.getFilename(),imageView);
+
+                    ImageUtils.saveBitmap(context,requestManager.getFilename(),bmp);
+
+                    onRequestComplete(requestManager,true, bmp, null, bmp);
+
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+
+
+            }
+        });
     }
     
     public static ImageCacheManager getInstance(Context context){
