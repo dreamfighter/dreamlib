@@ -6,6 +6,6 @@
     <string name="df_password">Password</string>
     <string name="df_signin">SignIn</string>
     <string name="df_cancel">Cancel</string>
-    <string name="df_version">Version %1$s</string>
+    <string name="df_version">Versi %1$s</string>
     <string name="df_proxy_auth">Enter %1$s Proxy Authentication</string>
 </resources>
