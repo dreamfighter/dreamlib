@@ -435,6 +435,8 @@ public abstract class SqliteHelper extends SQLiteOpenHelper{
 					e.printStackTrace();
 				} catch (IllegalAccessException e) {
 					e.printStackTrace();
+				} catch (ClassCastException e) {
+					e.printStackTrace();
 				}
 			}
 			
