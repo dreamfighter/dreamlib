@@ -422,12 +422,14 @@ public abstract class SqliteHelper extends SQLiteOpenHelper{
 					}else if(field.getType().getName().equalsIgnoreCase("java.util.List")){
 						listType.put(columName, field);
 					}else{
-						BaseEntity value = (BaseEntity)field.get(object);
-						if(value.getId()==null){
-							value = (BaseEntity)saveEntity(field.get(object), true, field.get(object).getClass().getSimpleName(), retrieveColumns(field.get(object).getClass()), new ContentValues());
-						}
-						values.put(columName,value.getId());
-						Logger.log(this, object.getClass().getSimpleName() + " => ["+columName+","+value.getId()+"]");
+						if(field.get(object) instanceof BaseEntity) {
+                            BaseEntity value = (BaseEntity) field.get(object);
+                            if (value.getId() == null) {
+                                value = (BaseEntity) saveEntity(field.get(object), true, field.get(object).getClass().getSimpleName(), retrieveColumns(field.get(object).getClass()), new ContentValues());
+                            }
+                            values.put(columName, value.getId());
+                            Logger.log(this, object.getClass().getSimpleName() + " => [" + columName + "," + value.getId() + "]");
+                        }
 						
 					}
 					
