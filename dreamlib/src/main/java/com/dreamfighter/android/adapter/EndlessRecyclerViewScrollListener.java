@@ -17,7 +17,6 @@ public abstract class EndlessRecyclerViewScrollListener extends RecyclerView.OnS
     private int visibleThreshold = 5;
     // The current offset index of data you have loaded
     private int currentPage = 0;
-
     // The total number of items in the dataset after the last load
     private int previousTotalItemCount = 0;
     // True if we are still waiting for the last set of data to load.
@@ -25,175 +24,102 @@ public abstract class EndlessRecyclerViewScrollListener extends RecyclerView.OnS
     // Sets the starting page index
     private int startingPageIndex = 0;
 
-    // Sets the  footerViewType
-    private int defaultNoFooterViewType = -1;
-    private int footerViewType = -1;
-
-
-    private String mTag = "scroll-listener";
-
-
     RecyclerView.LayoutManager mLayoutManager;
 
     public EndlessRecyclerViewScrollListener(LinearLayoutManager layoutManager) {
-        init();
         this.mLayoutManager = layoutManager;
+        this.startingPageIndex = getStartingPageIndex();
+        this.currentPage = getCurrentPage();
     }
 
     public EndlessRecyclerViewScrollListener(GridLayoutManager layoutManager) {
-        init();
         this.mLayoutManager = layoutManager;
         visibleThreshold = visibleThreshold * layoutManager.getSpanCount();
+        this.startingPageIndex = getStartingPageIndex();
+        this.currentPage = getCurrentPage();
     }
 
     public EndlessRecyclerViewScrollListener(StaggeredGridLayoutManager layoutManager) {
-        init();
         this.mLayoutManager = layoutManager;
         visibleThreshold = visibleThreshold * layoutManager.getSpanCount();
+        this.startingPageIndex = getStartingPageIndex();
+        this.currentPage = getCurrentPage();
     }
-
-    //init from  self-define
-    private void init() {
-        footerViewType = getFooterViewType(defaultNoFooterViewType);
-        startingPageIndex = getStartingPageIndex();
-
-        int threshold = getVisibleThreshold();
-        if (threshold > visibleThreshold) {
-            visibleThreshold = threshold;
-        }
-    }
-
-
-    // This happens many times a second during a scroll, so be wary of the code you place here.
-    // We are given a few useful parameters to help us work out if we need to load some more data,
-    // but first we check if we are waiting for the previous load to finish.
-    @Override
-    public void onScrolled(final RecyclerView view, int dx, int dy) {
-
-        ////when dy=0---->list is clear totalItemCount == 0 or init load  previousTotalItemCount=0
-        if (dy <= 0) return;
-//        Log.i(mTag, "onScrolled-------dy:" + dy);
-
-        RecyclerView.Adapter adapter = view.getAdapter();
-        int totalItemCount = adapter.getItemCount();
-
-        int lastVisibleItemPosition = getLastVisibleItemPosition();
-
-        boolean isAllowLoadMore = (lastVisibleItemPosition + visibleThreshold) > totalItemCount;
-
-        if (isAllowLoadMore) {
-
-            if (isUseFooterView()) {
-                if (!isFooterView(adapter)) {
-
-                    if (totalItemCount < previousTotalItemCount) {//swiprefresh reload result to change listsize ,reset pageindex
-                        this.currentPage = this.startingPageIndex;
-//                            Log.i(mTag, "****totalItemCount:" + totalItemCount + ",previousTotalItemCount:" + previousTotalItemCount + ",currentpage=startingPageIndex");
-                    } else if (totalItemCount == previousTotalItemCount) {//if load failure or load empty data , we rollback  pageindex
-                        currentPage = currentPage == startingPageIndex ? startingPageIndex : --currentPage;
-//                            Log.i(mTag, "!!!!currentpage:" + currentPage);
-                    }
-
-                    loading = false;
-                }
-            } else {
-                if (totalItemCount > previousTotalItemCount) loading = false;
-            }
-
-            if (!loading) {
-
-                // If it isn’t currently loading, we check to see if we have breached
-                // the visibleThreshold and need to reload more data.
-                // If we do need to reload some more data, we execute onLoadMore to fetch the data.
-                // threshold should reflect how many total columns there are too
-
-                previousTotalItemCount = totalItemCount;
-                currentPage++;
-                onLoadMore(currentPage, totalItemCount);
-                loading = true;
-                Logger.log(mTag, "request pageindex:" + currentPage + ",totalItemsCount:" + totalItemCount);
-
-            }
-        }
-    }
-
-
-    @Override
-    public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
-        super.onScrollStateChanged(recyclerView, newState);
-
-    }
-
-
-    public boolean isUseFooterView() {
-        boolean isUse = footerViewType != defaultNoFooterViewType;
-//        Log.i(mTag, "isUseFooterView:" + isUse);
-        return isUse;
-    }
-
-
-    public boolean isFooterView(RecyclerView.Adapter padapter) {
-
-        boolean isFooterView = false;
-        int ptotalItemCount = padapter.getItemCount();
-
-        if (ptotalItemCount > 0) {
-
-            int lastPosition = ptotalItemCount - 1;
-            int lastViewType = padapter.getItemViewType(lastPosition);
-
-            //  check the lastview is footview
-            isFooterView = lastViewType == footerViewType;
-        }
-//        Log.i(mTag, "isFooterView:" + isFooterView);
-
-        return isFooterView;
-    }
-
-    private int getLastVisibleItemPosition() {
-        int lastVisibleItemPosition = 0;
-
-        if (mLayoutManager instanceof StaggeredGridLayoutManager) {
-            int[] lastVisibleItemPositions = ((StaggeredGridLayoutManager) mLayoutManager).findLastVisibleItemPositions(null);
-            // get maximum element within the list
-            lastVisibleItemPosition = getLastVisibleItem(lastVisibleItemPositions);
-        } else if (mLayoutManager instanceof LinearLayoutManager) {
-            lastVisibleItemPosition = ((LinearLayoutManager) mLayoutManager).findLastVisibleItemPosition();
-        } else if (mLayoutManager instanceof GridLayoutManager) {
-            lastVisibleItemPosition = ((GridLayoutManager) mLayoutManager).findLastVisibleItemPosition();
-        }
-        return lastVisibleItemPosition;
-    }
-
 
     public int getLastVisibleItem(int[] lastVisibleItemPositions) {
         int maxSize = 0;
         for (int i = 0; i < lastVisibleItemPositions.length; i++) {
             if (i == 0) {
                 maxSize = lastVisibleItemPositions[i];
-            } else if (lastVisibleItemPositions[i] > maxSize) {
+            }
+            else if (lastVisibleItemPositions[i] > maxSize) {
                 maxSize = lastVisibleItemPositions[i];
             }
         }
         return maxSize;
     }
 
+    // This happens many times a second during a scroll, so be wary of the code you place here.
+    // We are given a few useful parameters to help us work out if we need to load some more data,
+    // but first we check if we are waiting for the previous load to finish.
+    @Override
+    public void onScrolled(RecyclerView view, int dx, int dy) {
+        int lastVisibleItemPosition = 0;
+        int totalItemCount = mLayoutManager.getItemCount();
 
-    // set FooterView type
-    // if don't use footview loadmore  default: -1
-    public abstract int getFooterViewType(int defaultNoFooterViewType);
+        if (mLayoutManager instanceof StaggeredGridLayoutManager) {
+            int[] lastVisibleItemPositions = ((StaggeredGridLayoutManager) mLayoutManager).findLastVisibleItemPositions(null);
+            // get maximum element within the list
+            lastVisibleItemPosition = getLastVisibleItem(lastVisibleItemPositions);
+        } else if (mLayoutManager instanceof GridLayoutManager) {
+            lastVisibleItemPosition = ((GridLayoutManager) mLayoutManager).findLastVisibleItemPosition();
+        } else if (mLayoutManager instanceof LinearLayoutManager) {
+            lastVisibleItemPosition = ((LinearLayoutManager) mLayoutManager).findLastVisibleItemPosition();
+        }
 
-    // Defines the process for actually loading more data based on page
-    public abstract void onLoadMore(int page, int totalItemsCount);
+        // If the total item count is zero and the previous isn't, assume the
+        // list is invalidated and should be reset back to initial state
+        if (totalItemCount < previousTotalItemCount) {
+            this.currentPage = getStartingPageIndex();
+            this.previousTotalItemCount = totalItemCount;
+            if (totalItemCount == 0) {
+                this.loading = true;
+            }
+        }
+        // If it’s still loading, we check to see if the dataset count has
+        // changed, if so we conclude it has finished loading and update the current page
+        // number and total item count.
+        if (loading && (totalItemCount > previousTotalItemCount)) {
+            loading = false;
+            previousTotalItemCount = totalItemCount;
+        }
 
-    //set visibleThreshold   default: 5
-    public int getVisibleThreshold() {
-        return visibleThreshold;
+        // If it isn’t currently loading, we check to see if we have breached
+        // the visibleThreshold and need to reload more data.
+        // If we do need to reload some more data, we execute onLoadMore to fetch the data.
+        // threshold should reflect how many total columns there are too
+        if (!loading && (lastVisibleItemPosition + visibleThreshold) > totalItemCount) {
+            currentPage++;
+            onLoadMore(currentPage, totalItemCount, view);
+            loading = true;
+        }
     }
 
-    //set startingPageIndex   default: 0
-    public int getStartingPageIndex() {
+    // Call this method whenever performing new searches
+    public void resetState() {
+        this.currentPage = this.startingPageIndex;
+        this.previousTotalItemCount = 0;
+        this.loading = true;
+    }
+
+    // Defines the process for actually loading more data based on page
+    public abstract void onLoadMore(int page, int totalItemsCount, RecyclerView view);
+
+    public int getStartingPageIndex(){
         return startingPageIndex;
     }
 
+    public int getCurrentPage() {
+        return currentPage;
+    }
 }
