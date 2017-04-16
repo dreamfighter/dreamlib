@@ -69,6 +69,34 @@ public class GoogleMessagingManager {
         }
         return true;
     }
+
+    /**
+     * Gets the current registration ID for application on GCM service.
+     * <p>
+     * If result is empty, the app needs to register.
+     *
+     * @return registration ID, or empty string if there is no existing
+     *         registration ID.
+     */
+    public String getRegistrationId() {
+        //final SharedPreferences prefs = getGCMPreferences(context);
+        String registrationId = prefs.getString(PROPERTY_REG_ID, "");
+        if ("".equals(registrationId)) {
+            Logger.log("Registration not found.");
+            return "";
+        }
+        // Check if app was updated; if so, it must clear the registration ID
+        // since the existing regID is not guaranteed to work with the new
+        // app version.
+        int registeredVersion = prefs.getInt(appVersion, Integer.MIN_VALUE);
+
+        int currentVersion = CommonUtils.getAppVersion(context);
+        if (registeredVersion != currentVersion) {
+            Logger.log( "App version changed.");
+            return "";
+        }
+        return registrationId;
+    }
     
     /**
      * Gets the current registration ID for application on GCM service.
@@ -133,10 +161,10 @@ public class GoogleMessagingManager {
                             // message using the 'from' address in the message.
 
                             // Persist the regID - no need to register again.
-                            storeRegistrationId(context, regid, prefs);
+                            storeRegistrationId(context, regid);
                         }else if(!"".equals(regid) && gcmListener!=null){
                             gcmListener.onRegistered(regid);
-                            
+                            storeRegistrationId(context, regid);
                         }
                         //mDisplay.setText(regid);
                         Logger.log("RegistrationId="+regid);
@@ -165,7 +193,7 @@ public class GoogleMessagingManager {
      * @param context application's context.
      * @param regId registration ID
      */
-    private void storeRegistrationId(Context context, String regId, SharedPreferences prefs) {
+    private void storeRegistrationId(Context context, String regId) {
         //final SharedPreferences prefs = getGCMPreferences(context);
         Logger.log("context " + context);
         int appVersion = CommonUtils.getAppVersion(context);

@@ -3,22 +3,30 @@ package id.dreamfighter.android.utils;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.util.Date;
+
 import id.dreamfighter.android.log.Logger;
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Bitmap.Config;
 import android.graphics.Canvas;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
+import android.provider.MediaStore;
 import android.renderscript.Allocation;
 import android.renderscript.Element;
 import android.renderscript.RenderScript;
 import android.renderscript.ScriptIntrinsicBlur;
 import android.util.Log;
+
+import com.dreamfighter.android.utils.*;
 
 public class ImageUtils {
     
