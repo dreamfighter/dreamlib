@@ -756,6 +756,10 @@ public class RequestManager {
                                 //isBitmap.close();
                                 //bytes.close();
                                 bitmap = BitmapFactory.decodeFile(filename);
+                                if(bitmap==null){
+                                    File file = new File(filename);
+                                    file.deleteOnExit();
+                                }
                             }catch (IOException e) {
                                 e.printStackTrace();
                             }catch (OutOfMemoryError e) {

@@ -12,8 +12,10 @@ import java.io.Writer;
 import java.util.HashMap;
 import java.util.Map;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.database.Cursor;
 import android.graphics.Typeface;
@@ -22,6 +24,7 @@ import android.os.Build;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.provider.Settings.Secure;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.telephony.TelephonyManager;
 
@@ -107,7 +110,7 @@ public class CommonUtils {
      */
     public static String getBaseDirectory(Context context){
         String state = Environment.getExternalStorageState();
-        if (state.equals(Environment.MEDIA_MOUNTED)){
+        if (Environment.MEDIA_MOUNTED.equals(state)){
             String dir = Environment.getExternalStorageDirectory() + "/Android/data/"+context.getPackageName()+"/cacheImage/";
             File dirFile = new File(dir);
             if(!dirFile.exists()){
@@ -187,13 +190,17 @@ public class CommonUtils {
      * @throws UnsupportedEncodingException
      */
     public static byte[] getIMEI(Context context) throws UnsupportedEncodingException{
-        String identifier = null;
-        TelephonyManager tm = (TelephonyManager)context.getSystemService(Context.TELEPHONY_SERVICE);
-        if (tm != null){
-              identifier = tm.getDeviceId();
-        }
-        if (identifier == null || identifier.length() == 0){
-              identifier = Secure.getString(context.getContentResolver(),Secure.ANDROID_ID);
+
+        String identifier = "";
+        if (ContextCompat.checkSelfPermission(context, Manifest.permission.READ_PHONE_STATE)
+                == PackageManager.PERMISSION_GRANTED) {
+            TelephonyManager tm = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
+            if (tm != null) {
+                identifier = tm.getDeviceId();
+            }
+            if (identifier == null || identifier.length() == 0) {
+                identifier = Secure.getString(context.getContentResolver(), Secure.ANDROID_ID);
+            }
         }
         return identifier.getBytes("UTF-8");
     }

@@ -300,6 +300,29 @@ public class ImageUtils {
         context.startActivityForResult(chooser, requestCode);
     }
 
+    public static void takeFile(Activity context, String filename,int requestCode){
+        Intent galleryIntent = new Intent(Intent.ACTION_GET_CONTENT, null);
+        galleryIntent.setType("*/*");
+        galleryIntent.addCategory(Intent.CATEGORY_OPENABLE);
+
+        if (Build.VERSION.SDK_INT > 19) {
+            galleryIntent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        }
+
+        Intent cameraIntent = new Intent(
+                android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+        Uri imageUri = Uri.fromFile(new File(filename));
+        cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
+
+        Intent chooser = new Intent(Intent.ACTION_CHOOSER);
+        chooser.putExtra(Intent.EXTRA_INTENT, galleryIntent);
+        chooser.putExtra(Intent.EXTRA_TITLE, "Choose Image");
+
+        Intent[] intentArray = {cameraIntent};
+        chooser.putExtra(Intent.EXTRA_INITIAL_INTENTS, intentArray);
+        context.startActivityForResult(chooser, requestCode);
+    }
+
     /**
      * calculate orientation to adjust picture orientation and aspect ratio
      * @param bitmap
