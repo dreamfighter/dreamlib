@@ -49,6 +49,7 @@ public class ConnectionManager{
     private String fileNameUpload;
     private String fileName;
     private boolean secure = true;
+    private long totalDownload = 0l;
     
     public interface ConnectionListener{
         void onRequestBitmapComplete(ConnectionManager connectionManager,int requestCode,Bitmap bitmap);
@@ -111,7 +112,11 @@ public class ConnectionManager{
             Logger.log("["+valuePair.getName()+":"+valuePair.getValue()+"]");
         }
     }
-    
+
+    public long getTotalDownload() {
+        return totalDownload;
+    }
+
     /**
      * request to the server with url and request code for get specific response if there is more than one 
      * request in time
@@ -148,7 +153,17 @@ public class ConnectionManager{
             req.setFileUpload(fileUpload);
             req.setUpload(true);
         }
-        
+        if(responseType.equals(ResponseType.CUSTOM)){
+            req.setCustomRequest(new RequestManager.CustomRequest() {
+                @Override
+                public void onRequest(InputStream is) {
+                    if(connectionListener!=null){
+                        totalDownload = req.getFilesize();
+                        connectionListener.onCustomRequest(ConnectionManager.this,requestCode,is);
+                    }
+                }
+            });
+        }
         req.setRequestListeners(new RequestListeners() {
             
             @Override
@@ -158,6 +173,8 @@ public class ConnectionManager{
                     connectionListener.requestOnProgress(ConnectionManager.this,requestCode, total);
                 }
             }
+
+
             
             @Override
             public void onRequestComplete(RequestManager requestManager,
