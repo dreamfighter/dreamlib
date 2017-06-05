@@ -125,6 +125,7 @@ public class RequestManager {
     private CustomRequest customRequest;
     private boolean secure = false;
     private long timeout = 60000;
+    private boolean requestCancel = false;
 
     public interface CustomRequest{
         void onRequest(InputStream is);
@@ -840,6 +841,9 @@ public class RequestManager {
         protected void onProgressUpdate(Integer... values) {
             super.onProgressUpdate(values);
             currentDownload = (long)values[0];
+            if(requestCancel){
+                cancel(true);
+            }
             //Long updateTime = System.currentTimeMillis();
             if(requestListeners!=null){
                 //intervalUpdateProgress = System.currentTimeMillis();
@@ -1044,6 +1048,10 @@ public class RequestManager {
 
     public void setCustomRequest(CustomRequest customRequest) {
         this.customRequest = customRequest;
+    }
+
+    public void setRequestCancel(boolean requestCancel) {
+        this.requestCancel = requestCancel;
     }
 
     public boolean isSecure() {

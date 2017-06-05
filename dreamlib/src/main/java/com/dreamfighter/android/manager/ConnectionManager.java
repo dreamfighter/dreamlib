@@ -50,6 +50,7 @@ public class ConnectionManager{
     private String fileName;
     private boolean secure = true;
     private long totalDownload = 0l;
+    private boolean reqquestCancel = false;
     
     public interface ConnectionListener{
         void onRequestBitmapComplete(ConnectionManager connectionManager,int requestCode,Bitmap bitmap);
@@ -113,6 +114,9 @@ public class ConnectionManager{
         }
     }
 
+    public void cancel(){
+
+    }
     public long getTotalDownload() {
         return totalDownload;
     }
@@ -168,6 +172,9 @@ public class ConnectionManager{
             
             @Override
             public void onRequestProgress(DownloadInfo requestInfo, Long currentDownload) {
+                if(reqquestCancel){
+                    req.setRequestCancel(true);
+                }
                 if(connectionListener!=null){
                     double total = (100.0 * currentDownload) / req.getFilesize();
                     connectionListener.requestOnProgress(ConnectionManager.this,requestCode, total);
@@ -375,5 +382,9 @@ public class ConnectionManager{
 
     public void setFileName(String fileName) {
         this.fileName = fileName;
+    }
+
+    public void setReqquestCancel(boolean reqquestCancel) {
+        this.reqquestCancel = reqquestCancel;
     }
 }
