@@ -12,6 +12,7 @@ import com.dreamfighter.android.enums.ResponseType;
 import com.dreamfighter.android.log.Logger;
 import com.dreamfighter.android.manager.RequestManager.RequestListeners;
 import com.dreamfighter.android.utils.CommonUtils;
+import com.dreamfighter.android.utils.ImageUtils;
 
 /**
  * this cache time to live is in milisecond
@@ -32,6 +33,8 @@ public class ImageCacheManager implements RequestListeners{
     private boolean refresh = false;
     private Object currentDisplay = new Object();
     private int tryingCounter = 0;
+    private int width = 0;
+    private int height = 0;
 
     private class ImageRequest{
         public Object obj;
@@ -67,7 +70,7 @@ public class ImageCacheManager implements RequestListeners{
         //super(context);
         this.context = context;
         this.requestManager = new RequestManager(context);
-        this.requestManager.setResponseType(ResponseType.BITMAP);
+        this.requestManager.setResponseType(ResponseType.RAW);
         this.requestManager.setRequestListeners(this);
         initializeDirectory();
     }
@@ -124,7 +127,11 @@ public class ImageCacheManager implements RequestListeners{
             if(img.exists()){
                 Bitmap bitmap = null;
                 try{
-                    bitmap = BitmapFactory.decodeFile(fileName);
+                    if(width!=0 && height!=0){
+                        bitmap = ImageUtils.resampleBitmap(fileName,width,height);
+                    }else {
+                        bitmap = BitmapFactory.decodeFile(fileName);
+                    }
                 }catch(OutOfMemoryError e){
                     e.printStackTrace();
                     System.gc();
@@ -166,6 +173,14 @@ public class ImageCacheManager implements RequestListeners{
         }
     }
 
+    public void setWidth(int width) {
+        this.width = width;
+    }
+
+    public void setHeight(int height) {
+        this.height = height;
+    }
+
     public void request(Object obj, String url) {
         String fileName = CommonUtils.extractFilenameFromImgUrl(url);
         request(obj,url,fileName);
@@ -179,6 +194,8 @@ public class ImageCacheManager implements RequestListeners{
         }
     }
 
+
+
     @Override
     public void onRequestComplete(RequestManager requestManager,
             Boolean success, Bitmap bitmap, String resultString,
@@ -191,6 +208,11 @@ public class ImageCacheManager implements RequestListeners{
         }
         Logger.log("linkedQueue["+this.index+"].size()=>"+linkedQueue.size());
         if(imageCacheListener!=null && currImgRequest!=null && currImgRequest.obj==currentDisplay){
+            if(width!=0 && height!=0){
+                bitmap = ImageUtils.resampleBitmap(requestManager.getFilename(),width,height);
+            }else {
+                bitmap = BitmapFactory.decodeFile(requestManager.getFilename());
+            }
             if(bitmap!=null){
                 imageCacheListener.onLoaded(currImgRequest.obj, bitmap, System.currentTimeMillis());
             }else{
