@@ -7,7 +7,8 @@ public enum RequestInfo {
 	INFO_FAILED("failed"), 
 	INFO_FILE_NOT_FOUND("file_not_found"), 
 	INFO_URL_NOT_FOUND("url_not_found"), 
-	INFO_DOWNLOADED_FILEPATH_NOTFOUND("downloaded_filepath_notfound"), 
+	INFO_DOWNLOADED_FILEPATH_NOTFOUND("downloaded_filepath_notfound"),
+	INFO_PERMISSION_DENIED("permission_denied"),
 	INFO_COMPLETE("complete");
 	
 	private String value = "";

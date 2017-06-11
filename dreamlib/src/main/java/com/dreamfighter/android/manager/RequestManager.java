@@ -49,11 +49,14 @@ import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
 import org.apache.http.protocol.HTTP;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.ConnectivityManager;
@@ -61,6 +64,8 @@ import android.net.NetworkInfo.DetailedState;
 import android.os.AsyncTask;
 import android.os.AsyncTask.Status;
 import android.os.Build;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
@@ -736,6 +741,20 @@ public class RequestManager {
                         
                         if(filename!=null){
                             try{
+                                if((Build.VERSION_CODES.M>=Build.VERSION.SDK_INT && ContextCompat.checkSelfPermission(getContext(),
+                                        Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                                        != PackageManager.PERMISSION_GRANTED)){
+
+                                    if(getContext() instanceof Activity) {
+                                        ActivityCompat.requestPermissions((Activity) getContext(),
+                                                new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                                                0);
+                                    }
+
+                                    setDownloadInfo(DownloadInfo.INFO_PERMISSION_DENIED);
+                                    requestInfo = RequestInfo.INFO_PERMISSION_DENIED;
+                                    return false;
+                                }
                                 //ByteArrayOutputStream bytes = new ByteArrayOutputStream();
                                 
                                 //bitmap.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
@@ -771,6 +790,21 @@ public class RequestManager {
                         }
                     }else if(responseType.equals(ResponseType.RAW)){
                         if(filename!=null){
+                            if((Build.VERSION_CODES.M>=Build.VERSION.SDK_INT && ContextCompat.checkSelfPermission(getContext(),
+                                    Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                                    != PackageManager.PERMISSION_GRANTED)){
+
+                                if(getContext() instanceof Activity) {
+                                    ActivityCompat.requestPermissions((Activity) getContext(),
+                                            new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                                            0);
+                                }
+
+                                setDownloadInfo(DownloadInfo.INFO_PERMISSION_DENIED);
+                                requestInfo = RequestInfo.INFO_PERMISSION_DENIED;
+                                return false;
+                            }
+
                             FileOutputStream f = new FileOutputStream(filename);
     
                             int readlen = 0;
