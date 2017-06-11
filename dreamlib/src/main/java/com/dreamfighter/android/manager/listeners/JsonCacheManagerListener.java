@@ -8,6 +8,7 @@ public abstract class JsonCacheManagerListener {
     public void onLoaded(JSONObject jsonObject){}
     public void onLoaded(JSONArray jsonArray){}
     public void onLoaded(String json){}
+    public void onProgress(double proress){}
     public void onFailed(String messge){}
     
     public boolean validateJson(JSONObject jsonObject){

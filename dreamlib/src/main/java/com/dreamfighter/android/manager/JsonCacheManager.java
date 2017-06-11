@@ -34,7 +34,9 @@ public class JsonCacheManager {
         if (!dir.exists()) {
             dir.mkdirs();
         }
-    }public JsonCacheManager(Context context,String fileName) {
+    }
+
+    public JsonCacheManager(Context context,String fileName) {
         this.directory = context.getApplicationInfo().dataDir + File.separator;
         this.fileName = fileName;
         
@@ -50,8 +52,7 @@ public class JsonCacheManager {
             File file = new File(directory + fileName);
             if (file.exists() && enableCache) {
                 String json = FileUtils.readFileToString(directory + fileName);
-                
-                
+
                 return new JSONObject(json);
                 
             }
@@ -213,6 +214,14 @@ public class JsonCacheManager {
 
     public void getFromServer() {
         connectionManager.setConnectionListener(new ConnectionListener() {
+
+            @Override
+            public void requestOnProgress(ConnectionManager connectionManager, int requestCode, double currentDownload) {
+                if (jsonCacheManagerListener != null) {
+                    jsonCacheManagerListener.onProgress(currentDownload);
+                }
+            }
+
             @Override
             public void onRequestComplete(ConnectionManager connectionManager,
                     int requestCode, String resultString) {
@@ -227,7 +236,7 @@ public class JsonCacheManager {
                             try {
                                 jsonObject = new JSONObject(resultString);
                                 if(classDefinition!=null){
-                                jsonCacheManagerListener
+                                    jsonCacheManagerListener
                                         .onLoadedObject(JsonUtils
                                                 .jsonToClassMapping(jsonObject,
                                                         classDefinition));
