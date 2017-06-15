@@ -1,5 +1,7 @@
 package com.dreamfighter.android.utils;
 
+import android.os.Bundle;
+
 import com.dreamfighter.android.log.Logger;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -13,14 +15,18 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 
 public class JsonUtils {
@@ -54,6 +60,70 @@ public class JsonUtils {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public static JSONObject toJsonString(Bundle bundle){
+        JSONObject json = new JSONObject();
+        Set<String> keys = bundle.keySet();
+        for (String key : keys) {
+            try {
+                // json.put(key, bundle.get(key)); see edit below
+                json.put(key, wrap(bundle.get(key)));
+            } catch(JSONException e) {
+                //Handle exception here
+            }
+        }
+        return json;
+    }
+
+    private static Object wrap(Object o) {
+        if (o == null) {
+            return JSONObject.NULL;
+        }
+        if (o instanceof JSONArray || o instanceof JSONObject) {
+            return o;
+        }
+        if (o.equals(JSONObject.NULL)) {
+            return o;
+        }
+        try {
+            if (o instanceof Collection) {
+                return new JSONArray((Collection) o);
+            } else if (o.getClass().isArray()) {
+                return toJSONArray(o);
+            }
+            if (o instanceof Map) {
+                return new JSONObject((Map) o);
+            }
+            if (o instanceof Boolean ||
+                    o instanceof Byte ||
+                    o instanceof Character ||
+                    o instanceof Double ||
+                    o instanceof Float ||
+                    o instanceof Integer ||
+                    o instanceof Long ||
+                    o instanceof Short ||
+                    o instanceof String) {
+                return o;
+            }
+            if (o.getClass().getPackage().getName().startsWith("java.")) {
+                return o.toString();
+            }
+        } catch (Exception ignored) {
+        }
+        return null;
+    }
+
+    private static JSONArray toJSONArray(Object array) throws JSONException {
+        JSONArray result = new JSONArray();
+        if (!array.getClass().isArray()) {
+            throw new JSONException("Not a primitive array: " + array.getClass());
+        }
+        final int length = Array.getLength(array);
+        for (int i = 0; i < length; ++i) {
+            result.put(wrap(Array.get(array, i)));
+        }
+        return result;
     }
 
     public static <T> T parse(String json, Class<T> classDefinition) {
