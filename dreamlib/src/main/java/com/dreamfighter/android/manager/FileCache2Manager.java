@@ -8,6 +8,7 @@ import com.dreamfighter.android.enums.ActionMethod;
 import com.dreamfighter.android.enums.ContentType;
 import com.dreamfighter.android.enums.RequestInfo;
 import com.dreamfighter.android.enums.ResponseType;
+import com.dreamfighter.android.log.Logger;
 import com.dreamfighter.android.manager.listeners.ConnectionListener;
 import com.dreamfighter.android.utils.CommonUtils;
 
@@ -25,6 +26,7 @@ public class FileCache2Manager {
     private static FileCache2Manager instance;
     private static final int DOWNLOAD = 0;
     private static final int LOADED = 1;
+    private static final int FAILED = 2;
     private static final int MAX_CONNECTION = 5;
 
     private Context context;
@@ -32,7 +34,7 @@ public class FileCache2Manager {
     private Map<String,Integer> state = new HashMap<String,Integer>();
 
     private Map<Object,RequestManager> fileCaches = new HashMap<Object,RequestManager>();
-    private Map<Object,FileCacheManager.FileLoaderListener> cacheListener = new HashMap<Object,FileCacheManager.FileLoaderListener>();
+    private Map<Object,FileCacheManager.FileLoaderListener> cacheListener = new ConcurrentHashMap<Object,FileCacheManager.FileLoaderListener>();
     //private FileCacheManager.FileLoaderListener listener;
 
     public class FileRequest{
@@ -79,6 +81,10 @@ public class FileCache2Manager {
         return this;
     }
 
+    public void reset(String fileName){
+        state.put(fileName,FAILED);
+    }
+
     public void request(int obj, String url, final String fileName, final boolean refresh) {
         Integer localState = state.get(fileName);
         String dirStr = CommonUtils.getBaseDirectory(context);
@@ -86,29 +92,31 @@ public class FileCache2Manager {
         File file = new File(fullName);
 
         if(!refresh) {
+
             if (localState!=null && localState == LOADED && file.exists()) {
                 FileCacheManager.FileLoaderListener listener = cacheListener.get(obj);
 
+                cacheListener.remove(obj);
                 if(listener!=null){
 
                     listener.onLoaded(obj,file,file.lastModified());
                 }
-                cacheListener.remove(obj);
                 return;
             }
             if (localState!=null && localState == DOWNLOAD) {
                 //IGNORE
+
                 return;
             }
             if (file.exists()) {
                 state.put(fileName, LOADED);
                 FileCacheManager.FileLoaderListener listener = cacheListener.get(obj);
 
+                cacheListener.remove(obj);
                 if(listener!=null){
 
                     listener.onLoaded(obj,file,file.lastModified());
                 }
-                cacheListener.remove(obj);
                 return;
             }
         }
@@ -141,8 +149,11 @@ public class FileCache2Manager {
 
                 @Override
                 public void onRequestRawComplete(ConnectionManager connectionManager, int requestCode, Object object) {
+
+
                     FileCacheManager.FileLoaderListener listener = cacheListener.get(requestCode);
                     state.put(fileName,LOADED);
+
                     if(listener!=null){
                         listener.onLoaded(requestCode,new File(fullName),new Date().getTime());
                     }
@@ -168,6 +179,7 @@ public class FileCache2Manager {
                     if(listener!=null){
                         listener.onLoadFailed(requestCode,info.name());
                     }
+                    state.put(fileName,FAILED);
                     fileCaches.remove(requestCode);
                     cacheListener.remove(requestCode);
                     FileRequest fileRequest = linkedQueue.poll();
