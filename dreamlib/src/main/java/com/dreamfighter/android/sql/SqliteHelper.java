@@ -266,13 +266,14 @@ public abstract class SqliteHelper extends SQLiteOpenHelper{
 	    return false;
 	}
 
-
+	/*
 	@Override
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 		Logger.log(this, "Upgrading database from version " + oldVersion + " to "
 			+ newVersion );
 
 	}
+	*/
 
     public void resetDB(SQLiteDatabase db){
         db.execSQL("DROP TABLE IF EXISTS " + tableName());
