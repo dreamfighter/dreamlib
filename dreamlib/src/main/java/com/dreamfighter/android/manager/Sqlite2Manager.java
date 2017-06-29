@@ -3,6 +3,7 @@ package com.dreamfighter.android.manager;
 import java.util.Map;
 
 import android.content.Context;
+import android.database.sqlite.SQLiteDatabase;
 
 public class Sqlite2Manager extends SqliteManager{
 
@@ -16,4 +17,8 @@ public class Sqlite2Manager extends SqliteManager{
 		return COLUMNS;
 	}
 
+	@Override
+	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+
+	}
 }
