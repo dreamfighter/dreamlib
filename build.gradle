@@ -6,10 +6,34 @@ buildscript {
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:2.1.0'
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7.3'
     }
     allprojects {
         repositories {
             jcenter()
+        }
+    }
+}
+
+plugins {
+    id "com.jfrog.bintray" version "1.7.3"
+}
+
+bintray {
+    user = 'dreamfighter'
+    key = 'e415a74b0d5adaedfc202866b3be72cc4c2afbc2'
+    pkg {
+        repo = 'generic'
+        name = 'androiddreamlib'
+        userOrg = 'dreamfighter'
+        licenses = ['Apache-2.0']
+        vcsUrl = 'https://github.com/dreamfighter/dreamlib.git'
+        version {
+            name = '1.0'
+            desc = 'Gradle Bintray Plugin 1.0 final'
+            released  = new Date()
+            vcsTag = '1.3.0'
+            attributes = ['gradle-plugin': 'com.use.less:com.use.less.gradle:gradle-useless-plugin']
         }
     }
 }
