@@ -242,7 +242,10 @@ public abstract class SqliteHelper extends SQLiteOpenHelper{
 	}
 	
 	private boolean isOpen(){
-		return database.isOpen();
+		if(database!=null) {
+			return database.isOpen();
+		}
+		return false;
 	}
 	
 	private boolean isTableExists(){
@@ -725,9 +728,13 @@ public abstract class SqliteHelper extends SQLiteOpenHelper{
 			field.setAccessible(true);
 			if(field.getType().getName().equalsIgnoreCase("java.lang.Integer")){
 				//Logger.log(this, object.getClass().getSimpleName() + "columName ="+columName+" => INTEGER");
-				id = (Integer)field.get(object) * 1l;
+				if(field.get(object)!=null) {
+					id = (Integer) field.get(object) * 1l;
+				}
 			}else if(field.getType().getName().equalsIgnoreCase("java.lang.Long")){
-				id = (Long)field.get(object);
+                if(field.get(object)!=null) {
+                    id = (Long) field.get(object);
+                }
 			}
 			//id = field.getLong(object); 
 		} catch (NoSuchFieldException e) {
