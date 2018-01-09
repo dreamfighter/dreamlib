@@ -51,6 +51,7 @@ public class ConnectionManager{
     private boolean secure = true;
     private long totalDownload = 0l;
     private boolean reqquestCancel = false;
+    private int timeout = 60000;
     
     public interface ConnectionListener{
         void onRequestBitmapComplete(ConnectionManager connectionManager,int requestCode,Bitmap bitmap);
@@ -69,7 +70,11 @@ public class ConnectionManager{
     public ConnectionManager(Context context) {
         this.context = context;
     }
-    
+
+    public void setTimeout(int timeout) {
+        this.timeout = timeout;
+    }
+
     public boolean isOnline(){
         try {
             ConnectivityManager __cm = (ConnectivityManager)context.getSystemService((Context.CONNECTIVITY_SERVICE));
@@ -143,6 +148,8 @@ public class ConnectionManager{
         req.setContentType(contentType.getValue());
         req.setResponseType(responseType);
         req.addHeadersData(listHeader);
+        req.setTimeout(timeout);
+
 
         if(responseType.equals(ResponseType.RAW) && fileName==null){
             Logger.error("WARNING: file name for raw response is null");

@@ -2,9 +2,11 @@ package com.dreamfighter.android.utils;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.io.Reader;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
@@ -29,6 +31,8 @@ import android.support.v7.app.AlertDialog;
 import android.telephony.TelephonyManager;
 
 import com.dreamfighter.android.manager.FileCache2Manager;
+
+import id.dreamfighter.android.log.Logger;
 
 public class CommonUtils {
     private static Map<String, Typeface> font = new HashMap<String, Typeface>();
@@ -257,4 +261,38 @@ public class CommonUtils {
             }
         }
     }
+
+    public static void copyFileFromAssets(Context context,String assetsSource,String target)
+    {
+        Logger.log("Database",
+                "Copy file " + assetsSource + " to " + target + "!");
+        byte[] buffer = new byte[1024];
+        OutputStream myOutput = null;
+        int length;
+        // Open your local db as the input stream
+        InputStream myInput = null;
+        try
+        {
+            myInput = context.getAssets().open(assetsSource);
+            // transfer bytes from the inputfile to the
+            // outputfile
+            myOutput =new FileOutputStream(target);
+            while((length = myInput.read(buffer)) > 0)
+            {
+                myOutput.write(buffer, 0, length);
+            }
+            myOutput.close();
+            myOutput.flush();
+            myInput.close();
+            Logger.log("Database",
+                    "Copy file " + assetsSource + " to " + target + " success!");
+
+
+        }
+        catch(IOException e)
+        {
+            e.printStackTrace();
+        }
+    }
+
 }

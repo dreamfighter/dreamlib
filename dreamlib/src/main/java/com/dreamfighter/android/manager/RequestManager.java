@@ -1,54 +1,5 @@
 package com.dreamfighter.android.manager;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.UnknownHostException;
-import java.security.KeyManagementException;
-import java.security.KeyStore;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.UnrecoverableKeyException;
-import java.security.cert.CertificateException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.apache.http.Header;
-import org.apache.http.HttpHost;
-import org.apache.http.HttpResponse;
-import org.apache.http.NameValuePair;
-import org.apache.http.NoHttpResponseException;
-import org.apache.http.auth.AuthScope;
-import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.CookieStore;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.conn.ClientConnectionManager;
-import org.apache.http.conn.params.ConnRouteParams;
-import org.apache.http.conn.scheme.PlainSocketFactory;
-import org.apache.http.conn.scheme.Scheme;
-import org.apache.http.conn.scheme.SchemeRegistry;
-import org.apache.http.cookie.Cookie;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.entity.mime.MultipartEntity;
-import org.apache.http.entity.mime.content.FileBody;
-import org.apache.http.entity.mime.content.StringBody;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.impl.conn.SingleClientConnManager;
-import org.apache.http.message.BasicHeader;
-import org.apache.http.message.BasicNameValuePair;
-import org.apache.http.params.BasicHttpParams;
-import org.apache.http.params.HttpConnectionParams;
-import org.apache.http.params.HttpParams;
-import org.apache.http.protocol.HTTP;
-
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -78,6 +29,54 @@ import com.dreamfighter.android.enums.RequestInfo;
 import com.dreamfighter.android.enums.ResponseType;
 import com.dreamfighter.android.log.Logger;
 import com.dreamfighter.android.utils.HttpUtils;
+
+import org.apache.http.Header;
+import org.apache.http.HttpHost;
+import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.CookieStore;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.conn.ClientConnectionManager;
+import org.apache.http.conn.params.ConnRouteParams;
+import org.apache.http.conn.scheme.PlainSocketFactory;
+import org.apache.http.conn.scheme.Scheme;
+import org.apache.http.conn.scheme.SchemeRegistry;
+import org.apache.http.cookie.Cookie;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.entity.mime.MultipartEntity;
+import org.apache.http.entity.mime.content.FileBody;
+import org.apache.http.entity.mime.content.StringBody;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.conn.SingleClientConnManager;
+import org.apache.http.message.BasicHeader;
+import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.params.BasicHttpParams;
+import org.apache.http.params.HttpConnectionParams;
+import org.apache.http.params.HttpParams;
+import org.apache.http.protocol.HTTP;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.UnknownHostException;
+import java.security.KeyManagementException;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.UnrecoverableKeyException;
+import java.security.cert.CertificateException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * this class is for managing request to server
@@ -352,9 +351,9 @@ public class RequestManager {
         /*
          * set htt params for timeout
          */
-        HttpParams httpParams = new BasicHttpParams();
-        HttpConnectionParams.setConnectionTimeout(httpParams, (int)timeout);
-        HttpConnectionParams.setSoTimeout(httpParams, (int)timeout);
+        HttpParams httpParams = httpClient.getParams();
+        //HttpConnectionParams.setConnectionTimeout(httpParams, (int)timeout);
+        //HttpConnectionParams.setSoTimeout(httpParams, (int)timeout);
         
         if(secure){
             
@@ -394,6 +393,23 @@ public class RequestManager {
         }*/
         
         HttpGet httpGet = new HttpGet(getUrlString());
+
+        HttpParams httpParamsGet = httpGet.getParams();
+        HttpConnectionParams.setConnectionTimeout(httpParamsGet, (int)timeout);
+        HttpConnectionParams.setSoTimeout(httpParamsGet, (int)timeout);
+
+        /*
+        TimerTask task = new TimerTask() {
+            @Override
+            public void run() {
+                if (httpGet != null) {
+                    httpGet.abort();
+                }
+            }
+        };
+        new TimerTask(true).schedule(task, timeout);
+        */
+
         if(listHeader!=null){
             for(String key:listHeader.keySet()){
                 httpGet.addHeader(key, listHeader.get(key));
@@ -464,7 +480,12 @@ public class RequestManager {
         // In a POST request, we don't pass the values in the URL.
         //Therefore we use only the web page URL as the parameter of the HttpPost argument
         HttpPost httpPost = new HttpPost(getUrlString());
-        
+
+
+        HttpParams httpParamsPost = httpPost.getParams();
+        HttpConnectionParams.setConnectionTimeout(httpParamsPost, (int)timeout);
+        HttpConnectionParams.setSoTimeout(httpParamsPost, (int)timeout);
+
         if(secure){
             
             try {
@@ -776,7 +797,7 @@ public class RequestManager {
                                 //isBitmap.close();
                                 //bytes.close();
                                 bitmap = BitmapFactory.decodeFile(filename);
-                                if(bitmap==null){
+                                if(bitmap==null || filesize!=totalRead){
                                     File file = new File(filename);
                                     file.deleteOnExit();
                                 }
@@ -817,6 +838,10 @@ public class RequestManager {
                             }
                             is.close();
                             f.close();
+                            if(filesize!=totalRead){
+                                File file = new File(filename);
+                                file.deleteOnExit();
+                            }
                         }else{
                             setDownloadInfo(DownloadInfo.INFO_DOWNLOADED_FILEPATH_NOTFOUND);
                             requestInfo = RequestInfo.INFO_DOWNLOADED_FILEPATH_NOTFOUND;
@@ -1042,6 +1067,9 @@ public class RequestManager {
     }
     public String getPostType() {
         return postType;
+    }
+    public void setTimeout(int timeout){
+        this.timeout = timeout;
     }
     
     /**

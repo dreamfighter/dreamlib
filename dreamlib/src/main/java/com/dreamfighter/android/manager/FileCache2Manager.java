@@ -28,6 +28,7 @@ public class FileCache2Manager {
     private static final int LOADED = 1;
     private static final int FAILED = 2;
     private static final int MAX_CONNECTION = 5;
+    private int timeout = 3000;
 
     private Context context;
     private ConcurrentLinkedQueue<FileRequest> linkedQueue = new ConcurrentLinkedQueue<FileRequest>();
@@ -71,7 +72,11 @@ public class FileCache2Manager {
         }
     }
 
-    public FileCache2Manager addListener(Object obj,FileCacheManager.FileLoaderListener listener){
+    public void setTimeout(int timeout) {
+        this.timeout = timeout;
+    }
+
+    public FileCache2Manager addListener(Object obj, FileCacheManager.FileLoaderListener listener){
         cacheListener.put(obj,listener);
         return this;
     }
@@ -127,6 +132,7 @@ public class FileCache2Manager {
             conn.setActionMethod(ActionMethod.GET);
             conn.setFileName(fullName);
             conn.setResponseType(ResponseType.RAW);
+            conn.setTimeout(timeout);
 
             conn.setConnectionListener(new ConnectionListener(){
 
