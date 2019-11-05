@@ -26,7 +26,6 @@ import android.renderscript.RenderScript;
 import android.renderscript.ScriptIntrinsicBlur;
 import android.util.Log;
 
-import com.dreamfighter.android.utils.*;
 
 public class ImageUtils {
     

@@ -2,23 +2,26 @@ buildscript {
     repositories {
         jcenter()
         mavenCentral()
-        maven { url 'http://repo1.maven.org/maven2' }
-    }
-    dependencies {
-        classpath 'com.android.tools.build:gradle:2.1.0'
-        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7.3'
-    }
-    allprojects {
-        repositories {
-            jcenter()
+        google()
+        maven {
+            url "https://jcenter.bintray.com"
         }
     }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:3.5.1'
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7.3'
+    }
 }
 
-plugins {
-    id "com.jfrog.bintray" version "1.7.3"
+
+allprojects {
+    repositories {
+        google()
+        jcenter()
+    }
 }
 
+/*
 bintray {
     user = 'dreamfighter'
     key = 'e415a74b0d5adaedfc202866b3be72cc4c2afbc2'
@@ -37,3 +40,4 @@ bintray {
         }
     }
 }
+*/

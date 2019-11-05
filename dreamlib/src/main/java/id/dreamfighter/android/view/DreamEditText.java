@@ -2,14 +2,14 @@ package id.dreamfighter.android.view;
 
 import android.content.Context;
 import android.content.res.TypedArray;
+import androidx.appcompat.widget.AppCompatEditText;
 import android.util.AttributeSet;
-import android.widget.EditText;
 
-import com.dreamfighter.android.R;
+import id.dreamfighter.android.R;
 
 import id.dreamfighter.android.utils.CommonUtils;
 
-public class DreamEditText extends EditText{
+public class DreamEditText extends AppCompatEditText {
 
     public DreamEditText(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
