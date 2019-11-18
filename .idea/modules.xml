@@ -2,8 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/androiddreamlib.iml" filepath="$PROJECT_DIR$/androiddreamlib.iml" />
-      <module fileurl="file://$PROJECT_DIR$/dreamlib/dreamlib.iml" filepath="$PROJECT_DIR$/dreamlib/dreamlib.iml" />
+      <module fileurl="file://$PROJECT_DIR$/dreamlib/dreamlib-dreamlib.iml" filepath="$PROJECT_DIR$/dreamlib/dreamlib-dreamlib.iml" />
+      <module fileurl="file://$PROJECT_DIR$/git-dreamlib.iml" filepath="$PROJECT_DIR$/git-dreamlib.iml" />
     </modules>
   </component>
 </project>
