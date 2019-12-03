@@ -29,8 +29,11 @@ import android.provider.Settings.Secure;
 import androidx.core.content.ContextCompat;
 import androidx.appcompat.app.AlertDialog;
 import android.telephony.TelephonyManager;
+import android.util.Log;
 
 
+import androidx.core.content.FileProvider;
+import id.dreamfighter.android.BuildConfig;
 import id.dreamfighter.android.log.Logger;
 
 public class CommonUtils {
@@ -270,12 +273,20 @@ public class CommonUtils {
         int length;
         // Open your local db as the input stream
         InputStream myInput = null;
+
+        File file = new File(target);
+
+
+        Log.d("PROVIDER_AUTHORITY",context.getPackageName());
+        FileProvider.getUriForFile(context,
+                context.getPackageName() + ".provider",
+                file);
         try
         {
             myInput = context.getAssets().open(assetsSource);
             // transfer bytes from the inputfile to the
             // outputfile
-            myOutput =new FileOutputStream(target);
+            myOutput =new FileOutputStream(file);
             while((length = myInput.read(buffer)) > 0)
             {
                 myOutput.write(buffer, 0, length);
