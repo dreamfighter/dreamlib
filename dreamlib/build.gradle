@@ -2,7 +2,6 @@ apply plugin: 'com.android.library'
 //apply plugin: 'com.jfrog.bintray'
 
 android {
-    useLibrary 'org.apache.http.legacy'
     compileSdkVersion 28
     buildToolsVersion '28.0.3'
     lintOptions {
@@ -18,15 +17,41 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            libraryVariants.all { variant ->
+                variant.outputs.all {
+                    if (variant.buildType.name=="release") {
+                        outputFileName = "${rootProject.name}-${android.defaultConfig.versionName}.aar"
+                    }else{
+                        outputFileName = "../../../../../dreamquran/dreamquran/libs/${rootProject.name}-${android.defaultConfig.versionName}.aar"
+                    }
+
+                }
+            }
+            matchingFallbacks = ['release']
+
         }
+    }
+    compileOptions {
+        sourceCompatibility = 1.8
+        targetCompatibility = 1.8
     }
 }
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     testImplementation 'junit:junit:4.12'
-    implementation 'androidx.appcompat:appcompat:1.0.0'
-    implementation 'com.google.android.gms:play-services-gcm:11.0.1'
-    implementation 'androidx.recyclerview:recyclerview:1.0.0'
-    implementation 'com.google.code.gson:gson:2.4'
+    implementation 'androidx.appcompat:appcompat:1.1.0'
+    implementation 'com.google.android.gms:play-services-gcm:17.0.0'
+    implementation 'androidx.recyclerview:recyclerview:1.1.0'
+    implementation 'com.google.code.gson:gson:2.8.6'
+
+    //retrofit
+    implementation 'com.squareup.retrofit2:retrofit:2.4.0'
+    implementation 'com.squareup.retrofit2:adapter-rxjava2:2.4.0'
+    implementation 'com.squareup.okhttp3:okhttp:3.10.0'
+    implementation 'com.squareup.retrofit2:converter-jackson:2.1.0'
+
+    // RxJava
+    implementation 'io.reactivex.rxjava2:rxjava:2.2.5'
+    implementation 'io.reactivex.rxjava2:rxandroid:2.1.0'
 }

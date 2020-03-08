@@ -6,11 +6,37 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.CompressFormat;
 import android.graphics.BitmapFactory;
 
+import androidx.core.content.FileProvider;
+
 public class FileUtils {
+
+	public static File mkdirs(Context context,String path){
+		File dir = new File(path);
+
+		if(!dir.exists()){
+			FileProvider.getUriForFile(context,
+					context.getPackageName() + ".provider",
+					dir);
+			dir.mkdirs();
+			return dir;
+		}
+
+		return dir;
+	}
+
+	public static File file(Context context,String fileName){
+		File file = new File(fileName);
+		FileProvider.getUriForFile(context,
+				context.getPackageName() + ".provider",
+				file);
+
+		return file;
+	}
 
 	public static void writeStringToFile(String str, String filePath) throws IOException{
 		FileOutputStream fos = new FileOutputStream(
