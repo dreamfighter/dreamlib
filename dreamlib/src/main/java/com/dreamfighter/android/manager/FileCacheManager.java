@@ -4,13 +4,20 @@ import java.io.File;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import com.dreamfighter.android.enums.DownloadInfo;
+import com.dreamfighter.android.enums.RequestInfo;
 import com.dreamfighter.android.enums.ResponseType;
 import com.dreamfighter.android.log.Logger;
 import com.dreamfighter.android.manager.RequestManager.RequestListeners;
 import com.dreamfighter.android.utils.CommonUtils;
 
+import android.Manifest;
+import android.app.Activity;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.os.Build;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 
 /**
  * this cache time to live is in milisecond
@@ -94,10 +101,24 @@ public class FileCacheManager implements RequestListeners{
     public FileCacheManager(int cacheTTL, Context context) {
         //super(context);
         this.cacheTTL = cacheTTL;
+
         initializeDirectory();
     }
     
     public void initializeDirectory(){
+        if((Build.VERSION_CODES.M>=Build.VERSION.SDK_INT && ContextCompat.checkSelfPermission(context,
+                Manifest.permission.INTERNET)
+                != PackageManager.PERMISSION_GRANTED)){
+
+            if(context instanceof Activity) {
+                ActivityCompat.requestPermissions((Activity) context,
+                        new String[]{Manifest.permission.INTERNET},
+                        0);
+            }
+
+
+            return;
+        }
         String dirStr = CommonUtils.getBaseDirectory(context);
         if(dirStr!=null && !"".equals(dirStr)){
             File dir = new File(dirStr);

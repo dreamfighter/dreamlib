@@ -16,6 +16,7 @@ import java.util.Map;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
@@ -36,6 +37,8 @@ import id.dreamfighter.android.log.Logger;
 
 public class CommonUtils {
     private static Map<String, Typeface> font = new HashMap<String, Typeface>();
+    public static String CACHE_PATH_KEY = "cache-path";
+    public static String BASE_PATH_KEY = "base-path";
     
     public static Typeface getFont(Context context,String path){
         if(font.get(path)==null){
@@ -105,15 +108,16 @@ public class CommonUtils {
 
     public static String getExternalDirectory(Context context){
         String state = Environment.getExternalStorageState();
+        String temp = null;
         if (state.equals(Environment.MEDIA_MOUNTED)){
-            String path = Environment.getExternalStorageDirectory() + "/Android/data/"+context.getPackageName()+"/";
-            File dir = new File(path);
+            temp = Environment.getExternalStorageDirectory() + "/Android/data/"+context.getPackageName()+"/";
+            File dir = new File(temp);
             if(!dir.exists()){
                 dir.mkdirs();
             }
-            return path;
+
         }
-        else return null;
+        return temp;
     }
     
 
@@ -124,15 +128,33 @@ public class CommonUtils {
      */
     public static String getBaseDirectory(Context context){
         String state = Environment.getExternalStorageState();
+        String temp = null;
         if (Environment.MEDIA_MOUNTED.equals(state)){
-            String dir = Environment.getExternalStorageDirectory() + "/Android/data/"+context.getPackageName()+"/cacheImage/";
-            File dirFile = new File(dir);
+            temp = Environment.getExternalStorageDirectory() + "/Android/data/"+context.getPackageName() + "/cacheImage/";
+            File dirFile = new File(temp);
             if(!dirFile.exists()){
                 dirFile.mkdirs();
             }
-            return dir;
         }
-        else return null;
+
+        SharedPreferences pref = context.getSharedPreferences(context.getPackageName(), Context.MODE_PRIVATE);
+        String path = pref.getString(CACHE_PATH_KEY,null);
+        if(path==null){
+            path = temp;
+            pref.edit().putString(CACHE_PATH_KEY, path).apply();
+        }else{
+            try {
+                File dir = new File(path);
+                if (!dir.exists()) {
+                    dir.mkdirs();
+                }
+            }catch (Exception e){
+                e.printStackTrace();
+                path = temp;
+                pref.edit().putString(CACHE_PATH_KEY, path).apply();
+            }
+        }
+        return path;
     }
     
     /**

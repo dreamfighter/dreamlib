@@ -53,4 +53,10 @@ public class FileUtils {
 		Bitmap bitmap = BitmapFactory.decodeFile(filePath);
 		return bitmap;
 	}
+
+	public static void writeToFile(byte[] data, String fileName) throws IOException{
+		FileOutputStream out = new FileOutputStream(fileName);
+		out.write(data);
+		out.close();
+	}
 }
