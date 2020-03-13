@@ -308,7 +308,8 @@ public class RestClient {
         //dinamic IP
 
         APIService obj;
-        String mIpAddress = null;
+        String mIpAddress = "http://localhost/";
+        /*
         if(APIService.class.equals(clazz.getSuperclass())){
             try {
                 obj = ((APIService) clazz.newInstance());
@@ -319,11 +320,12 @@ public class RestClient {
                 e.printStackTrace();
             }
         }
+        */
         Retrofit.Builder restBuilder = new Retrofit.Builder();
 
-        if(mIpAddress!=null){
+        //if(mIpAddress!=null){
             restBuilder.baseUrl(mIpAddress);
-        }
+        //}
 
         Retrofit retrofit = restBuilder
                 .addConverterFactory(JacksonConverterFactory.create())
@@ -350,9 +352,9 @@ public class RestClient {
                     .method(original.method(), original.body())
                     .build();
 
-            String requestLog = String.format("Sending request %s: %s on %s%n%s",request.method(), request.url(), chain.connection(), request.header("Authorization"));
+            //String requestLog = String.format("Sending request %s: %s on %s%n%s",request.method(), request.url(), chain.connection(), request.header("Authorization"));
 
-            Log.d("Retrofit",requestLog);
+            //Log.d("Retrofit",requestLog);
 
             Response originalResponse = chain.proceed(request);
 
@@ -364,15 +366,19 @@ public class RestClient {
                 return originalResponse;
             }
         });
-        //builder.interceptors().add(new RestInterceptor());
+        builder.interceptors().add(new RawInterceptor());
+        builder.readTimeout(60, TimeUnit.SECONDS);
         builder.connectTimeout(60, TimeUnit.SECONDS);
+
 
         OkHttpClient client = builder.build();
 
+
         //dinamic IP
 
-        APIService obj;
-        String mIpAddress = null;
+        //APIService obj;
+        String mIpAddress = "http://localhost/";
+        /*
         if(APIService.class.equals(clazz.getSuperclass())){
             try {
                 obj = ((APIService) clazz.newInstance());
@@ -383,14 +389,15 @@ public class RestClient {
                 e.printStackTrace();
             }
         }
+        */
         Retrofit.Builder restBuilder = new Retrofit.Builder();
 
-        if(mIpAddress!=null){
+        //if(mIpAddress!=null){
             restBuilder.baseUrl(mIpAddress);
-        }
+        //}
 
         Retrofit retrofit = restBuilder
-                //.addConverterFactory(JacksonConverterFactory.create())
+                .addConverterFactory(JacksonConverterFactory.create())
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
 
                 .client(client)

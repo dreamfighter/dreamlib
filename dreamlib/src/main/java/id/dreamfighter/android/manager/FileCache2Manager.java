@@ -2,9 +2,15 @@ package id.dreamfighter.android.manager;
 
 import android.content.Context;
 import android.os.Handler;
+import android.util.Log;
 
-import id.dreamfighter.android.enums.ActionMethod;
-import id.dreamfighter.android.enums.RequestInfo;
+import java.io.File;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
+
 import id.dreamfighter.android.network.APIService;
 import id.dreamfighter.android.network.RestClient;
 import id.dreamfighter.android.utils.CommonUtils;
@@ -13,17 +19,7 @@ import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 import okhttp3.ResponseBody;
-import okio.BufferedSink;
-import okio.Okio;
 import retrofit2.Response;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
  * Created by dreamfighter on 8/25/16.
@@ -126,8 +122,9 @@ public class FileCache2Manager {
                 return;
             }
         }
-
+        Log.d("FileCache2Manager",""+fileCaches.size());
         if(fileCaches.size()<MAX_CONNECTION){
+
             state.put(fileName,DOWNLOAD);
             Observable<Response<ResponseBody>> obverable = RestClient.raw(APIService.class,(bytesRead, contentLength, percentage, done) -> {
                 Handler mainHandler = new Handler(context.getMainLooper());
@@ -135,6 +132,7 @@ public class FileCache2Manager {
                 mainHandler.post(() -> {
                     FileCacheManager.FileLoaderListener listener = cacheListener.get(obj);
                     if(listener!=null){
+                        //Log.d("PROGRESS",""+percentage);
                         listener.onProgress(obj,(long)percentage);
                     }
                 });
@@ -143,19 +141,12 @@ public class FileCache2Manager {
 
             fileCaches.put(obj,obverable);
 
-            obverable.subscribeOn(AndroidSchedulers.mainThread())
-                    .observeOn(Schedulers.io())
-                    .flatMap(o -> {
-                        try {
-                            File f = FileUtils.file(context, fileName);
-                            BufferedSink sink = Okio.buffer(Okio.sink(f));
-                            sink.writeAll(o.body().source());
-
-                            return Observable.just(f);
-                        } catch (IOException e) {
-                            return Observable.error(e);
-                        }
-                    }).subscribe(f -> {
+            obverable
+                    .subscribeOn(Schedulers.io())
+                    .flatMap(o -> FileUtils.fileObservable(context,o,fullName))
+                    .observeOn(AndroidSchedulers.mainThread())
+                    //.subscribeOn(AndroidSchedulers.mainThread())
+                    .subscribe(f -> {
                         FileCacheManager.FileLoaderListener listener = cacheListener.get(obj);
                         state.put(fileName,LOADED);
 
@@ -169,6 +160,7 @@ public class FileCache2Manager {
                             request((int)fileRequest.obj, fileRequest.url, fileRequest.filename,refresh);
                         }
             },throwable -> {
+                        throwable.printStackTrace();
                 FileCacheManager.FileLoaderListener listener = cacheListener.get(obj);
                 if(listener!=null){
                     listener.onLoadFailed(obj,throwable.getMessage());

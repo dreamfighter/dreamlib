@@ -14,7 +14,7 @@ import okio.Buffer;
 /**
  * Created by fitra on 19/04/2016.
  */
-class RestInterceptor implements Interceptor {
+class RawInterceptor implements Interceptor {
     private static final String TAG = "Retrofit";
 
     @Override
@@ -41,23 +41,23 @@ class RestInterceptor implements Interceptor {
         String responseLog = String.format(Locale.getDefault(),"Received response in %.1fms%n%s",
                 (t2 - t1) / 1e6d, response.headers());
 
-        String bodyString = response.body().string();
+       // String bodyString = response.body();
 
 
         //Log.d(TAG," --- start response--- " + t1);
         Log.d(TAG,"request : "+requestLog);
         Log.d(TAG,"response: "+responseLog);
-        Log.d(TAG,"Content : "+bodyString);
+        //Log.d(TAG,"Content : "+bodyString);
 
         //Log.d(TAG," --- end response---");
 
 //        Log.d("TAG","response"+"\n"+responseLog+"\n"+bodyString);
         //Log.d(TAG," --- END REST ---");
-        ResponseBody responseBody = ResponseBody.create(response.body().contentType(), bodyString);
+        //ResponseBody responseBody = ResponseBody.create(response.body(), bodyString);
 
         Response.Builder finalResponse = response.newBuilder()
                 .code(200)
-                .body(responseBody);
+                .body(response.body());
 
 
         return finalResponse.build();

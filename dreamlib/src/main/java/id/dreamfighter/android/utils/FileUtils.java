@@ -4,14 +4,22 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.CompressFormat;
 import android.graphics.BitmapFactory;
+import android.util.Log;
 
 import androidx.core.content.FileProvider;
+import io.reactivex.Observable;
+import okhttp3.ResponseBody;
+import okio.BufferedSink;
+import okio.Okio;
+import retrofit2.Response;
 
 public class FileUtils {
 
@@ -78,5 +86,107 @@ public class FileUtils {
 	public static Bitmap getBitmap(String filePath){
 		Bitmap bitmap = BitmapFactory.decodeFile(filePath);
 		return bitmap;
+	}
+
+	public static void deleteDirectory(File target){
+		File dir = target;
+		if (dir.isDirectory())
+		{
+			String[] children = dir.list();
+			for (int i = 0; i < children.length; i++)
+			{
+				File child = new File(dir, children[i]);
+				deleteDirectory(child);
+			}
+		}else{
+			dir.delete();
+		}
+	}
+
+	// If targetLocation does not exist, it will be created.
+	public static void copyDirectory(File sourceLocation , File targetLocation)
+			throws IOException {
+
+		if (sourceLocation.isDirectory()) {
+			if (!targetLocation.exists() && !targetLocation.mkdirs()) {
+				throw new IOException("Cannot create dir " + targetLocation.getAbsolutePath());
+			}
+
+			String[] children = sourceLocation.list();
+			for (int i=0; i<children.length; i++) {
+				copyDirectory(new File(sourceLocation, children[i]),
+						new File(targetLocation, children[i]));
+			}
+		} else {
+
+			// make sure the directory we plan to store the recording in exists
+			File directory = targetLocation.getParentFile();
+			if (directory != null && !directory.exists() && !directory.mkdirs()) {
+				throw new IOException("Cannot create dir " + directory.getAbsolutePath());
+			}
+
+			InputStream in = new FileInputStream(sourceLocation);
+			OutputStream out = new FileOutputStream(targetLocation);
+
+			// Copy the bits from instream to outstream
+			byte[] buf = new byte[1024];
+			int len;
+			while ((len = in.read(buf)) > 0) {
+				out.write(buf, 0, len);
+			}
+			in.close();
+			out.close();
+		}
+	}
+
+	public static Observable<File> fileObservable(Context context, Response<ResponseBody> o,String fileName){
+		try {
+			File f = FileUtils.file(context, fileName);
+			InputStream inputStream = null;
+			OutputStream outputStream = null;
+
+			try {
+				byte[] fileReader = new byte[4096];
+
+				long fileSize = o.body().contentLength();
+				long fileSizeDownloaded = 0;
+
+				inputStream = o.body().byteStream();
+				outputStream = new FileOutputStream(f);
+
+				while (true) {
+					int read = inputStream.read(fileReader);
+
+					if (read == -1) {
+						break;
+					}
+
+					outputStream.write(fileReader, 0, read);
+
+					fileSizeDownloaded += read;
+
+					//Log.d("FileUtils", "file download: " + fileSizeDownloaded + " of " + fileSize);
+				}
+
+				outputStream.flush();
+
+				return Observable.just(f);
+			} catch (IOException e) {
+				return Observable.error(e);
+			} finally {
+				if (inputStream != null) {
+					inputStream.close();
+				}
+
+				if (outputStream != null) {
+					outputStream.close();
+				}
+			}
+			//sink.flush();
+			//sink.close();
+			//return Observable.just(f);
+		} catch (IOException e) {
+			return Observable.error(e);
+		}
 	}
 }

@@ -5,14 +5,14 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
+import android.util.Log;
 
 import id.dreamfighter.android.log.Logger;
 import id.dreamfighter.android.utils.CommonUtils;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
-import com.google.android.gms.gcm.GcmPubSub;
-import com.google.android.gms.gcm.GoogleCloudMessaging;
-import com.google.android.gms.iid.InstanceID;
+import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.messaging.FirebaseMessaging;
 
 import java.io.IOException;
 
@@ -21,7 +21,7 @@ public class FirebaseManager {
     private final static int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
     public static final String EXTRA_MESSAGE = "message";
     public static final String PROPERTY_REG_ID = "registration_id";
-    private GoogleCloudMessaging gcm;
+    //private GoogleCloudMessaging gcm;
     private Context context;
     private String regid;
     private String senderId;
@@ -105,56 +105,34 @@ public class FirebaseManager {
      * shared preferences.
      */
     private void registerInBackground() {
-        new AsyncTask<Void, Void, String>() {
-            @Override
-            protected String doInBackground(Void... params) {
-                String msg = "";
-                if (checkPlayServices()) {
-                    try{
-                        InstanceID instanceID = InstanceID.getInstance(context);
-                        regid = instanceID.getToken(senderId,
-                                GoogleCloudMessaging.INSTANCE_ID_SCOPE, null);
-                        //gcm = GoogleCloudMessaging.getInstance(context);
-                        //regid = getRegistrationId(context, prefs);
-                        String registrationId = prefs.getString(PROPERTY_REG_ID, "");
-                        if (registrationId.equals(regid) && gcmListener!=null) {
-                            gcmListener.onRegistrationSuccess(regid);
+        FirebaseInstanceId.getInstance().getInstanceId().addOnCompleteListener(task -> {
+            if (!task.isSuccessful()) {
+                Log.w("FCM", "getInstanceId failed", task.getException());
+            }else {
 
-                            // You should send the registration ID to your server over HTTP,
-                            // so it can use GCM/HTTP or CCS to send messages to your app.
-                            // The request to your server should be authenticated if your app
-                            // is using accounts.
-                            sendRegistrationIdToBackend();
-                            
-                            subscribeTopics("global", regid);
+                // Get new Instance ID token
+                String token = task.getResult().getToken();
 
-                            // For this demo: we don't need to send it because the device
-                            // will send upstream messages to a server that echo back the
-                            // message using the 'from' address in the message.
+                // Log and toast
+                //String msg = getString (R.string.msg_token_fmt, token);
+                Log.d("FCM", token);
+                //Toast.makeText(MainActivity.this, msg, Toast.LENGTH_SHORT).show();
 
-                            // Persist the regID - no need to register again.
-                            storeRegistrationId(context, regid, prefs);
-                        }else if(!"".equals(regid) && gcmListener!=null){
-                            gcmListener.onRegistered(regid);
-                            
-                        }
-                        //mDisplay.setText(regid);
-                        Logger.log("RegistrationId="+regid);
-                    }catch(IOException e){
-                        e.printStackTrace();
-                    }
-                } else {
-                    Logger.log("No valid Google Play Services APK found.");
+                //FirebaseMessaging.getInstance().subscribeToTopic(user?.uid.toString())
+                if (gcmListener != null){
+                    gcmListener.onRegistrationSuccess(token);
                 }
-                return msg;
-            }
 
-            @Override
-            protected void onPostExecute(String msg) {
-                Logger.log(msg);
-                //mDisplay.append(msg + "\n");
+                // You should send the registration ID to your server over HTTP,
+                // so it can use GCM/HTTP or CCS to send messages to your app.
+                // The request to your server should be authenticated if your app
+                // is using accounts.
+                sendRegistrationIdToBackend();
+
+                subscribeTopics("global");
+
             }
-        }.execute();
+        });
         
     }
     
@@ -182,11 +160,12 @@ public class FirebaseManager {
      * @throws IOException if unable to reach the GCM PubSub service
      */
     // [START subscribe_topics]
-    public void subscribeTopics(String topic, String token) throws IOException {
-        GcmPubSub pubSub = GcmPubSub.getInstance(context);
+    public void subscribeTopics(String topic) {
+        //GcmPubSub pubSub = GcmPubSub.getInstance(context);
         
-        pubSub.subscribe(token, "/topics/" + topic, null);
-        
+        //pubSub.subscribe(token, "/topics/" + topic, null);
+
+        FirebaseMessaging.getInstance().subscribeToTopic(topic);
     }
     
     /**
