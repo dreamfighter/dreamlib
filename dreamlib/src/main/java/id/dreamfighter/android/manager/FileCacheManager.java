@@ -3,6 +3,7 @@ package id.dreamfighter.android.manager;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.os.Handler;
+import android.util.Log;
 
 import androidx.core.content.FileProvider;
 import id.dreamfighter.android.enums.DownloadInfo;
@@ -160,6 +161,10 @@ public class FileCacheManager{
 
 
         if(linkedQueue.isEmpty()){
+            currImgRequest = new FileRequest(obj, url, dir, filename);
+            //this.requestManager.setFilename(fullname);
+            //this.requestManager.request(url);
+
             RestClient.raw(APIService.class,(bytesRead, contentLength, percentage, done) -> {
                 Handler mainHandler = new Handler(context.getMainLooper());
 
@@ -170,28 +175,21 @@ public class FileCacheManager{
                 });
 
             }).get(url)
-                    .subscribeOn(AndroidSchedulers.mainThread())
+                    .subscribeOn(Schedulers.io())
                     .observeOn(Schedulers.io())
-                    .flatMap(o -> {
-                        try {
-                            File file = FileUtils.file(context, fullname);
-                            BufferedSink sink = Okio.buffer(Okio.sink(file));
-                            sink.writeAll(o.body().source());
+                    .flatMap(o -> FileUtils.fileObservable(context,o,fullname))
+                    .subscribeOn(AndroidSchedulers.mainThread())
+                    .subscribe(file -> {
+                        cacheListener.onLoaded(currImgRequest.obj, file, System.currentTimeMillis());
+                        FileRequest imgRequest = linkedQueue.poll();
 
-                            return Observable.just(file);
-                        } catch (IOException e) {
-                            return Observable.error(e);
+                        if(imgRequest!=null){
+                            currImgRequest = imgRequest;
+                            request(imgRequest.obj,imgRequest.url,imgRequest.dir, imgRequest.filename);
+                        }else{
+                            cacheListener.onAllLoadComplete();
                         }
-            }).subscribe(file -> {
-                cacheListener.onLoaded(currImgRequest.obj, file, System.currentTimeMillis());
-                FileRequest imgRequest = linkedQueue.poll();
-                //currImgRequest = linkedQueue.peek();
-                if(imgRequest!=null){
-                    request(imgRequest.obj,imgRequest.url,imgRequest.dir, imgRequest.filename);
-                }else{
-                    cacheListener.onAllLoadComplete();
-                }
-            },throwable -> cacheListener.onLoadFailed(currImgRequest.obj,throwable.getMessage()));
+                    },throwable -> cacheListener.onLoadFailed(currImgRequest.obj,throwable.getMessage()));
         }else{
             linkedQueue.add(new FileRequest(obj, url, dir, filename));
         }
