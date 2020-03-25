@@ -35,6 +35,8 @@ public class RestClient {
     //private static OkHttpClient client;
     //private Context context;
 
+    private OkHttpClient rawClient;
+
     public RestClient(){
 
     }

@@ -1,27 +1,17 @@
 package id.dreamfighter.android.manager;
 
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.os.Handler;
-import android.util.Log;
 
-import androidx.core.content.FileProvider;
-import id.dreamfighter.android.enums.DownloadInfo;
-import id.dreamfighter.android.log.Logger;
+import java.io.File;
+import java.util.concurrent.ConcurrentLinkedQueue;
+
 import id.dreamfighter.android.network.APIService;
-import id.dreamfighter.android.network.APIServiceSample;
 import id.dreamfighter.android.network.RestClient;
 import id.dreamfighter.android.utils.CommonUtils;
 import id.dreamfighter.android.utils.FileUtils;
-import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
-import okio.BufferedSink;
-import okio.Okio;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
  * this cache time to live is in milisecond
@@ -128,7 +118,8 @@ public class FileCacheManager{
         String fullname = dir + filename;
         FileUtils.mkdirs(context, dir);
         if(fullname!=null && !"".equals(fullname)){
-            File img = new File(fullname);
+            String realDirPath = CommonUtils.getRealDirectory(context);
+            File img = new File(realDirPath, filename);
             if(img.exists()){
                 
                 if(cacheListener!=null){
@@ -180,7 +171,7 @@ public class FileCacheManager{
                     .flatMap(o -> FileUtils.fileObservable(context,o,fullname))
                     .subscribeOn(AndroidSchedulers.mainThread())
                     .subscribe(file -> {
-                        cacheListener.onLoaded(currImgRequest.obj, file, System.currentTimeMillis());
+                        cacheListener.onLoaded(currImgRequest.obj, new File(fullname), System.currentTimeMillis());
                         FileRequest imgRequest = linkedQueue.poll();
 
                         if(imgRequest!=null){

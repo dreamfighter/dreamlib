@@ -1,5 +1,25 @@
 package id.dreamfighter.android.utils;
 
+import android.Manifest;
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.content.pm.PackageManager.NameNotFoundException;
+import android.database.Cursor;
+import android.graphics.Typeface;
+import android.net.Uri;
+import android.os.Build;
+import android.os.Environment;
+import android.provider.MediaStore;
+import android.provider.Settings.Secure;
+import android.telephony.TelephonyManager;
+import android.util.Log;
+
+import androidx.appcompat.app.AlertDialog;
+import androidx.core.content.ContextCompat;
+import androidx.core.content.FileProvider;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -14,32 +34,12 @@ import java.io.Writer;
 import java.util.HashMap;
 import java.util.Map;
 
-import android.Manifest;
-import android.content.Context;
-import android.content.SharedPreferences;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
-import android.content.pm.PackageManager.NameNotFoundException;
-import android.database.Cursor;
-import android.graphics.Typeface;
-import android.net.Uri;
-import android.os.Build;
-import android.os.Environment;
-import android.provider.MediaStore;
-import android.provider.Settings.Secure;
-import androidx.core.content.ContextCompat;
-import androidx.appcompat.app.AlertDialog;
-import android.telephony.TelephonyManager;
-import android.util.Log;
-
-
-import androidx.core.content.FileProvider;
-import id.dreamfighter.android.BuildConfig;
 import id.dreamfighter.android.log.Logger;
 
 public class CommonUtils {
     private static Map<String, Typeface> font = new HashMap<String, Typeface>();
     public static String CACHE_PATH_KEY = "cache-path";
+    public static String CACHE_REAL_PATH_KEY = "cache-real-path";
     public static String BASE_PATH_KEY = "base-path";
 
     public static Typeface getFont(Context context,String path){
@@ -140,23 +140,43 @@ public class CommonUtils {
         }
 
         SharedPreferences pref = context.getSharedPreferences(context.getPackageName(), Context.MODE_PRIVATE);
-        String path = pref.getString(CACHE_PATH_KEY,null);
-        if(path==null){
-            path = temp;
-            pref.edit().putString(CACHE_PATH_KEY, path).apply();
-        }else{
-            try {
-                File dir = new File(path);
+        String path = pref.getString(CACHE_PATH_KEY,temp);
+        //Log.d("["+context.getPackageName()+"]basepath",path);
+        try {
+            String r = pref.getString(CACHE_REAL_PATH_KEY,null);
+            if(r!=null) {
+                File dir = new File(r);
                 if (!dir.exists()) {
-                    dir.mkdirs();
+                    pref.edit()
+                            .putString(CACHE_REAL_PATH_KEY,temp)
+                            .putString(CACHE_PATH_KEY,temp).commit();
                 }
-            }catch (Exception e){
-                e.printStackTrace();
-                path = temp;
-                pref.edit().putString(CACHE_PATH_KEY, path).apply();
             }
+        }catch (Exception e){
+            e.printStackTrace();
         }
         return path;
+    }
+
+
+    /**
+     * get base application directory
+     * @param context
+     * @return url directory
+     */
+    public static String getRealDirectory(Context context){
+        String temp = Environment.getExternalStorageDirectory() + "/Android/data/" + context.getPackageName() + "/cacheImage/";
+
+        SharedPreferences pref = context.getSharedPreferences(context.getPackageName(), Context.MODE_PRIVATE);
+        String r = pref.getString(CACHE_REAL_PATH_KEY,null);
+        if(r!=null){
+            String state = Environment.getExternalStorageState();
+            if (Environment.MEDIA_MOUNTED.equals(state)){
+                return r;
+            }
+        }
+
+        return temp;
     }
 
     /**

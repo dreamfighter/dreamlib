@@ -1,6 +1,8 @@
 package id.dreamfighter.android.manager;
 
 import android.content.Context;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Handler;
 import android.util.Log;
 
@@ -90,10 +92,15 @@ public class FileCache2Manager {
     public void request(int obj, String url, final String fileName, final boolean refresh) {
         Integer localState = state.get(fileName);
         String dirStr = CommonUtils.getBaseDirectory(context);
+        String dirRealStr = CommonUtils.getRealDirectory(context);
         final String fullName = dirStr + fileName;
-        File file = FileUtils.file(context, fullName);
+        final String realFullName = dirRealStr + fileName;
+        File file = new File(realFullName);
 
         if(!refresh) {
+
+            Log.d("FILE",file.getAbsolutePath());
+            Log.d("FILE",file.exists()+"");
 
             if (localState!=null && localState == LOADED && file.exists()) {
                 FileCacheManager.FileLoaderListener listener = cacheListener.get(obj);
