@@ -40,6 +40,7 @@ public class CommonUtils {
     private static Map<String, Typeface> font = new HashMap<String, Typeface>();
     public static String CACHE_PATH_KEY = "cache-path";
     public static String CACHE_REAL_PATH_KEY = "cache-real-path";
+    public static String CACHE_URI_KEY = "cache-uri";
     public static String BASE_PATH_KEY = "base-path";
 
     public static Typeface getFont(Context context,String path){
@@ -149,6 +150,7 @@ public class CommonUtils {
                 if (!dir.exists()) {
                     pref.edit()
                             .putString(CACHE_REAL_PATH_KEY,temp)
+                            .putString(CACHE_URI_KEY,null)
                             .putString(CACHE_PATH_KEY,temp).commit();
                 }
             }
@@ -177,6 +179,11 @@ public class CommonUtils {
         }
 
         return temp;
+    }
+
+    public static String getBaseUri(Context context){
+        SharedPreferences pref = context.getSharedPreferences(context.getPackageName(), Context.MODE_PRIVATE);
+        return pref.getString(CACHE_URI_KEY,null);
     }
 
     /**

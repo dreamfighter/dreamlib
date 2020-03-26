@@ -39,28 +39,30 @@ public class FileUtils {
 
 	public static File mkdirs(Context context,String path){
 		File dir = new File(path);
+		File realDir = new File(CommonUtils.getRealDirectory(context));
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 				List<UriPermission> permissions = context.getContentResolver().getPersistedUriPermissions();
 				boolean found = false;
+				String uriStr = CommonUtils.getBaseUri(context);
 				for(UriPermission p:permissions){
 
-					if(p.getUri().getPath().equals(Uri.fromFile(dir).getPath())){
+					if(uriStr!=null && p.getUri().toString().equals(uriStr)){
 						found = true;
 						break;
 					}
 				}
-				if(!found && !dir.exists()){
+				if(!found && !realDir.exists()){
 					FileProvider.getUriForFile(context,
 							context.getPackageName() + ".provider",
-							dir);
-					dir.mkdirs();
+							realDir);
+					realDir.mkdirs();
 					return dir;
 				}
-		}else if(!dir.exists()){
+		}else if(!realDir.exists()){
 			FileProvider.getUriForFile(context,
 					context.getPackageName() + ".provider",
-					dir);
-			dir.mkdirs();
+					realDir);
+			realDir.mkdirs();
 			return dir;
 		}
 		return dir;
@@ -149,7 +151,9 @@ public class FileUtils {
 			for (int i = 0; i < children.length; i++)
 			{
 				File child = new File(dir, children[i]);
-				deleteDirectory(child);
+				if(!child.isDirectory()) {
+					deleteDirectory(child);
+				}
 			}
 		}else{
 			dir.delete();
@@ -212,15 +216,23 @@ public class FileUtils {
 
 				List<UriPermission> permissions = context.getContentResolver().getPersistedUriPermissions();
 				Uri uri = null;
-				for(UriPermission p:permissions){
-					Log.d("Uri",p.getUri().getPath());
-					Log.d("Uri expected",Uri.fromFile(targetLocation.getParentFile()).getPath());
+				String uriStr = CommonUtils.getBaseUri(context);
+				//if(uriStr!=null){
+				//	uri = Uri.parse(uriStr);
+				//}
 
-					if(p.getUri().getPath().equals(Uri.fromFile(targetLocation.getParentFile()).getPath())){
+				for(UriPermission p:permissions){
+					Log.d("DATA","" + p.getUri());
+					Log.d("DATA","" + uriStr);
+					//Log.d("Uri",p.getUri().getPath());
+					//Log.d("Uri expected",Uri.fromFile(targetLocation.getParentFile()).getPath());
+
+					if(uriStr!=null && p.getUri().toString().equals(uriStr)){
 						uri = p.getUri();
 						break;
 					}
 				}
+
 				if (uri!=null) {
 					DocumentFile pickedDir = DocumentFile.fromTreeUri(context, uri);
 					DocumentFile file = pickedDir.createFile("*/*", sourceLocation.getName());
@@ -231,7 +243,7 @@ public class FileUtils {
 			}
 
 			if(out==null){
-				File directory = targetLocation.getParentFile();
+				File directory = new File(CommonUtils.getRealDirectory(context),sourceLocation.getName());
 				if (directory != null && !directory.exists() && !directory.mkdirs()) {
 					throw new IOException("Cannot create dir " + directory.getAbsolutePath());
 				}
@@ -268,6 +280,7 @@ public class FileUtils {
 				inputStream = o.body().byteStream();
 				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 					try {
+						String uriStr = CommonUtils.getBaseUri(context);
 						List<UriPermission> permissions = context.getContentResolver().getPersistedUriPermissions();
 
 						Uri uri = null;
@@ -275,7 +288,7 @@ public class FileUtils {
 							//Log.d("Uri",p.getUri().getPath());
 							//Log.d("Uri expected",Uri.fromFile(f.getParentFile()).getPath());
 
-							if(p.getUri().getPath().equals(Uri.fromFile(f.getParentFile()).getPath())){
+							if(uriStr!=null && uriStr.equals(p.getUri().toString())){
 								uri = p.getUri();
 								break;
 							}
@@ -294,9 +307,10 @@ public class FileUtils {
 				}
 
 				if(outputStream==null){
+					File realFile = new File(dir,f.getName());
 					FileProvider.getUriForFile(context,
-							context.getPackageName() + ".provider", f);
-					outputStream = new FileOutputStream(f);
+							context.getPackageName() + ".provider", realFile);
+					outputStream = new FileOutputStream(realFile);
 				}
 
 				while (true) {
@@ -408,12 +422,18 @@ public class FileUtils {
 
 			if(r==null) {
 				String[] treeFile = docId.split(":");
+				if(treeFile.length==1){
+					return docId;
+				}
 				if ("primary".equalsIgnoreCase(treeFile[0])) {
 					return Environment.getExternalStorageDirectory() + "/" + treeFile[1];
 				}else {
 					File[] externalDirs = ContextCompat.getExternalFilesDirs(context, treeFile[0]);
-
 					for (File file : externalDirs) {
+						Log.d("externalDirs", file.getAbsolutePath());
+					}
+					for (File file : externalDirs) {
+						Log.d("externalDirs",file.getAbsolutePath());
 						if (Environment.isExternalStorageRemovable(file)) {
 							// Path is in format /storage.../Android....
 							// Get everything before /Android
