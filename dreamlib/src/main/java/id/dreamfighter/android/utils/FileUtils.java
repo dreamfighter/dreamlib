@@ -349,6 +349,59 @@ public class FileUtils {
 		}
 	}
 
+	public static OutputStream createFile(Context context, String fileName){
+
+		File f = new File(fileName);
+		String dir = CommonUtils.getRealDirectory(context);
+		InputStream inputStream = null;
+		OutputStream outputStream = null;
+
+		try {
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+				try {
+					String uriStr = CommonUtils.getBaseUri(context);
+					List<UriPermission> permissions = context.getContentResolver().getPersistedUriPermissions();
+
+					Uri uri = null;
+					for(UriPermission p:permissions){
+						//Log.d("Uri",p.getUri().getPath());
+						//Log.d("Uri expected",Uri.fromFile(f.getParentFile()).getPath());
+
+						if(uriStr!=null && uriStr.equals(p.getUri().toString())){
+							uri = p.getUri();
+							break;
+						}
+					}
+					if (uri!=null) {
+						DocumentFile pickedDir = DocumentFile.fromTreeUri(context, uri);
+						DocumentFile file = pickedDir.createFile("*/*", f.getName());
+
+						outputStream = context.getContentResolver().openOutputStream( file.getUri(), "w");
+					}
+
+
+				}catch (IOException e){
+					e.printStackTrace();
+				}
+			}
+
+			if(outputStream==null){
+				File realFile = new File(dir,f.getName());
+				FileProvider.getUriForFile(context,
+						context.getPackageName() + ".provider", realFile);
+				outputStream = new FileOutputStream(realFile);
+			}
+		} catch (IOException e) {
+			return null;
+		}
+		//sink.flush();
+		//sink.close();
+		//return Observable.just(f);
+
+
+		return outputStream;
+	}
+
 	/**
 	 * Get a file path from a Uri. This will get the the path for Storage Access
 	 * Framework Documents, as well as the _data field for the MediaStore and
