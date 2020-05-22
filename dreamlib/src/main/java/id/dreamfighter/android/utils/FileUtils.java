@@ -235,7 +235,10 @@ public class FileUtils {
 
 				if (uri!=null) {
 					DocumentFile pickedDir = DocumentFile.fromTreeUri(context, uri);
-					DocumentFile file = pickedDir.createFile("*/*", sourceLocation.getName());
+					DocumentFile file = pickedDir.findFile(sourceLocation.getName());
+					if(file==null) {
+						file = pickedDir.createFile("*/*", sourceLocation.getName());
+					}
 
 					out = context.getContentResolver().openOutputStream( file.getUri(), "w");
 				}
@@ -295,7 +298,10 @@ public class FileUtils {
 						}
 						if (uri!=null) {
 							DocumentFile pickedDir = DocumentFile.fromTreeUri(context, uri);
-							DocumentFile file = pickedDir.createFile("*/*", f.getName());
+							DocumentFile file = pickedDir.findFile(f.getName());
+							if(file==null) {
+								file = pickedDir.createFile("*/*", f.getName());
+							}
 
 							outputStream = context.getContentResolver().openOutputStream( file.getUri(), "w");
 						}
@@ -374,7 +380,10 @@ public class FileUtils {
 					}
 					if (uri!=null) {
 						DocumentFile pickedDir = DocumentFile.fromTreeUri(context, uri);
-						DocumentFile file = pickedDir.createFile("*/*", f.getName());
+						DocumentFile file = pickedDir.findFile(f.getName());
+						if(file==null) {
+							file = pickedDir.createFile("*/*", f.getName());
+						}
 
 						outputStream = context.getContentResolver().openOutputStream( file.getUri(), "w");
 					}
