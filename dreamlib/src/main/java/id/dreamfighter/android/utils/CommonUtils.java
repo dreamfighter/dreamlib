@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
+import android.content.res.TypedArray;
 import android.database.Cursor;
 import android.graphics.Typeface;
 import android.net.Uri;
@@ -14,8 +15,13 @@ import android.os.Environment;
 import android.provider.MediaStore;
 import android.provider.Settings.Secure;
 import android.telephony.TelephonyManager;
+import android.util.DisplayMetrics;
 import android.util.Log;
+import android.util.TypedValue;
+import android.view.Display;
+import android.view.WindowManager;
 
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
@@ -34,6 +40,7 @@ import java.io.Writer;
 import java.util.HashMap;
 import java.util.Map;
 
+import id.dreamfighter.android.R;
 import id.dreamfighter.android.log.Logger;
 
 public class CommonUtils {
@@ -353,5 +360,57 @@ public class CommonUtils {
             e.printStackTrace();
         }
     }
+    public static int getNavigationBarHeight(Context context) {
+        if(context!=null) {
+            int resourceId = context.getResources().getIdentifier("navigation_bar_height", "dimen", "android");
+            if (resourceId > 0) {
+                return context.getResources().getDimensionPixelSize(resourceId);
+            }
+        }
+        return 0;
+    }
 
+    public static int getStatusBarHeight(Context context) {
+        int result = 0;
+        if(context!=null) {
+            int resourceId = context.getResources().getIdentifier("status_bar_height", "dimen", "android");
+            if (resourceId > 0) {
+                result = context.getResources().getDimensionPixelSize(resourceId);
+            }
+        }
+        Logger.log("result=>"+result);
+        return result;
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR1)
+    public static boolean hasImmersive(Context context) {
+        Display d = ((WindowManager) context.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
+
+        DisplayMetrics realDisplayMetrics = new DisplayMetrics();
+        d.getRealMetrics(realDisplayMetrics);
+
+        int realHeight = realDisplayMetrics.heightPixels;
+        int realWidth = realDisplayMetrics.widthPixels;
+
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        d.getMetrics(displayMetrics);
+
+        int displayHeight = displayMetrics.heightPixels;
+        int displayWidth = displayMetrics.widthPixels;
+
+        return (realWidth > displayWidth) || (realHeight > displayHeight);
+    }
+
+
+    public static int getActionBarHeight(Context context){
+        int[] textSizeAttr = new int[] { android.R.attr.actionBarSize, R.attr.actionBarSize };
+        TypedArray a = context.obtainStyledAttributes(new TypedValue().data, textSizeAttr);
+        int heightHolo = a.getDimensionPixelSize(0, -1);
+        int heightMaterial = a.getDimensionPixelSize(1, -1);
+
+        Logger.log("DEBUG", "Height android.R.attr.: " + heightHolo + "");
+        Logger.log("DEBUG", "Height R.attr.: " + heightMaterial + "");
+        a.recycle();
+        return heightMaterial;
+    }
 }
