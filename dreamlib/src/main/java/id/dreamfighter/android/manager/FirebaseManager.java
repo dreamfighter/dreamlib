@@ -10,8 +10,8 @@ import android.util.Log;
 import id.dreamfighter.android.log.Logger;
 import id.dreamfighter.android.utils.CommonUtils;
 import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GooglePlayServicesUtil;
-import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.android.gms.common.GooglePlayServicesUtilLight;
+import com.google.firebase.installations.FirebaseInstallations;
 import com.google.firebase.messaging.FirebaseMessaging;
 
 import java.io.IOException;
@@ -52,24 +52,6 @@ public class FirebaseManager {
         
     }
     
-    public boolean checkPlayServices() {
-        final int resultCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(context);
-        if (resultCode != ConnectionResult.SUCCESS) {
-            if (GooglePlayServicesUtil.isUserRecoverableError(resultCode)) {
-                ((Activity)context).runOnUiThread(new Runnable() {
-                    public void run() {
-                        GooglePlayServicesUtil.getErrorDialog(resultCode, (Activity)context, PLAY_SERVICES_RESOLUTION_REQUEST).show();
-                    }
-                });
-                
-            } else {
-                Logger.log("This device is not supported.");
-            }
-            return false;
-        }
-        return true;
-    }
-    
     /**
      * Gets the current registration ID for application on GCM service.
      * <p>
@@ -105,13 +87,14 @@ public class FirebaseManager {
      * shared preferences.
      */
     private void registerInBackground() {
-        FirebaseInstanceId.getInstance().getInstanceId().addOnCompleteListener(task -> {
+
+        FirebaseInstallations.getInstance().getId().addOnCompleteListener(task -> {
             if (!task.isSuccessful()) {
                 Log.w("FCM", "getInstanceId failed", task.getException());
             }else {
 
                 // Get new Instance ID token
-                String token = task.getResult().getToken();
+                String token = task.getResult();
 
                 // Log and toast
                 //String msg = getString (R.string.msg_token_fmt, token);
@@ -156,7 +139,7 @@ public class FirebaseManager {
     /**
      * Subscribe to any GCM topics of interest, as defined by the TOPICS constant.
      *
-     * @param token GCM token
+     * @param topic push notification topic
      * @throws IOException if unable to reach the GCM PubSub service
      */
     // [START subscribe_topics]
