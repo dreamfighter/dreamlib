@@ -88,14 +88,13 @@ public class FirebaseManager {
      * shared preferences.
      */
     private void registerInBackground() {
-
-        FirebaseInstallations.getInstance().getToken(false).addOnCompleteListener(task -> {
+        FirebaseMessaging.getInstance().getToken().addOnCompleteListener(task -> {
             if (!task.isSuccessful()) {
                 Log.w("FCM", "getInstanceId failed", task.getException());
             }else {
 
                 // Get new Instance ID token
-                String token = Objects.requireNonNull(task.getResult()).getToken();
+                String token = task.getResult();
 
                 // Log and toast
                 //String msg = getString (R.string.msg_token_fmt, token);
