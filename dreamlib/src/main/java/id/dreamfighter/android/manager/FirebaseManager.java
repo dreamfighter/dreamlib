@@ -15,6 +15,7 @@ import com.google.firebase.installations.FirebaseInstallations;
 import com.google.firebase.messaging.FirebaseMessaging;
 
 import java.io.IOException;
+import java.util.Objects;
 
 
 public class FirebaseManager {
@@ -88,13 +89,13 @@ public class FirebaseManager {
      */
     private void registerInBackground() {
 
-        FirebaseInstallations.getInstance().getId().addOnCompleteListener(task -> {
+        FirebaseInstallations.getInstance().getToken(false).addOnCompleteListener(task -> {
             if (!task.isSuccessful()) {
                 Log.w("FCM", "getInstanceId failed", task.getException());
             }else {
 
                 // Get new Instance ID token
-                String token = task.getResult();
+                String token = Objects.requireNonNull(task.getResult()).getToken();
 
                 // Log and toast
                 //String msg = getString (R.string.msg_token_fmt, token);
