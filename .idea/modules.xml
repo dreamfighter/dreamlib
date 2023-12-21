@@ -2,8 +2,11 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/android-studio-dreamlib.iml" filepath="$PROJECT_DIR$/android-studio-dreamlib.iml" />
-      <module fileurl="file://$PROJECT_DIR$/dreamlib/dreamlib-dreamlib.iml" filepath="$PROJECT_DIR$/dreamlib/dreamlib-dreamlib.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/dreamlib.iml" filepath="$PROJECT_DIR$/.idea/modules/dreamlib.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/dreamlib/dreamlib.dreamlib.iml" filepath="$PROJECT_DIR$/.idea/modules/dreamlib/dreamlib.dreamlib.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/dreamlib/dreamlib.dreamlib.androidTest.iml" filepath="$PROJECT_DIR$/.idea/modules/dreamlib/dreamlib.dreamlib.androidTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/dreamlib/dreamlib.dreamlib.main.iml" filepath="$PROJECT_DIR$/.idea/modules/dreamlib/dreamlib.dreamlib.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/dreamlib/dreamlib.dreamlib.unitTest.iml" filepath="$PROJECT_DIR$/.idea/modules/dreamlib/dreamlib.dreamlib.unitTest.iml" />
     </modules>
   </component>
 </project>

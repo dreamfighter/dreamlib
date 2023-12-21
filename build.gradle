@@ -1,4 +1,8 @@
 buildscript {
+    ext {
+        ext.localProperties = new Properties()
+    }
+    ext.localProperties.load(new FileInputStream(rootProject.file("local.properties")))
     repositories {
         jcenter()
         mavenCentral()
@@ -8,7 +12,7 @@ buildscript {
         }
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.5.2'
+        classpath 'com.android.tools.build:gradle:4.2.0'
         classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7.3'
     }
 }
