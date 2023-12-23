@@ -90,6 +90,10 @@ public class FileCache2Manager {
     }
 
     public void request(int obj, String url, final String fileName, final boolean refresh) {
+        request(obj, url, fileName, refresh, null);
+    }
+
+    public void request(int obj, String url, final String fileName, final boolean refresh, String contentType) {
         Integer localState = state.get(fileName);
         String dirStr = CommonUtils.getBaseDirectory(context);
         String dirRealStr = CommonUtils.getRealDirectory(context);
@@ -150,6 +154,14 @@ public class FileCache2Manager {
 
             obverable
                     .subscribeOn(Schedulers.io())
+                    .flatMap(o -> {
+
+                        Log.d("Content-Type",contentType + "----" + o.headers().get("content-type"));
+                        if(contentType!=null && o!=null && o.headers()!=null && !contentType.equals(o.headers().get("content-type"))){
+                            throw new Exception("Content do not Match");
+                        }
+                        return Observable.just(o);
+                    })
                     .flatMap(o -> FileUtils.fileObservable(context,o,fullName))
                     .observeOn(AndroidSchedulers.mainThread())
                     //.subscribeOn(AndroidSchedulers.mainThread())

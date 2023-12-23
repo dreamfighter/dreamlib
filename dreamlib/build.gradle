@@ -5,7 +5,6 @@ plugins {
 
 android {
     compileSdkVersion 33
-    buildToolsVersion '28.0.3'
     lintOptions {
         abortOnError false
     }
@@ -13,7 +12,7 @@ android {
         minSdkVersion 16
         targetSdkVersion 33
         versionCode 1
-        versionName "3.0.7"
+        versionName "3.0.12"
     }
     buildTypes {
         release {
@@ -75,8 +74,8 @@ publishing {
         release(MavenPublication) {
             groupId = 'com.github.dreamfighter'
             artifactId = 'dreamlib'
-            version = '1.0.64'
-            artifact("$buildDir/outputs/aar/${project.getName()}-release.aar")
+            version = "${android.defaultConfig.versionName}"
+            artifact("$buildDir/outputs/aar/${project.getName()}-${android.defaultConfig.versionName}.aar")
             pom.withXml {
                 def dependenciesNode = asNode().appendNode('dependencies')
                 configurations.implementation.allDependencies.each {
