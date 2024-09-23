@@ -103,9 +103,6 @@ public class FileCache2Manager {
 
         if(!refresh) {
 
-            Log.d("FILE",file.getAbsolutePath());
-            Log.d("FILE",file.exists()+"");
-
             if (localState!=null && localState == LOADED && file.exists()) {
                 FileCacheManager.FileLoaderListener listener = cacheListener.get(obj);
 
@@ -133,7 +130,7 @@ public class FileCache2Manager {
                 return;
             }
         }
-        Log.d("FileCache2Manager",""+fileCaches.size());
+
         if(fileCaches.size()<MAX_CONNECTION){
 
             state.put(fileName,DOWNLOAD);

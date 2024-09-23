@@ -78,9 +78,6 @@ public class FileUtils {
 				Uri uri = null;
 				for(UriPermission p:permissions){
 
-					Log.d("Uri",p.getUri().getPath());
-					Log.d("Uri expected",Uri.fromFile(file.getParentFile()).getPath());
-
 					if(p.getUri().getPath().equals(Uri.fromFile(file.getParentFile()).getPath())){
 						uri = p.getUri();
 						break;
@@ -222,8 +219,6 @@ public class FileUtils {
 				//}
 
 				for(UriPermission p:permissions){
-					Log.d("DATA","" + p.getUri());
-					Log.d("DATA","" + uriStr);
 					//Log.d("Uri",p.getUri().getPath());
 					//Log.d("Uri expected",Uri.fromFile(targetLocation.getParentFile()).getPath());
 
@@ -427,8 +422,6 @@ public class FileUtils {
 		final boolean isKitKat = Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT;
 
 		// DocumentProvider
-		Log.d("isDocumentUri",""+DocumentsContract.isDocumentUri(context, uri));
-		Log.d("isDocumentUri1",""+DocumentFile.isDocumentUri(context,uri));
 		if (isKitKat && DocumentsContract.isDocumentUri(context, uri)) {
 			// ExternalStorageProvider
 			if (isExternalStorageDocument(uri)) {
@@ -477,7 +470,6 @@ public class FileUtils {
 		// MediaStore (and general)
 		else if ("content".equalsIgnoreCase(uri.getScheme())) {
 			String docId = DocumentsContract.getTreeDocumentId(uri);
-			Log.d("DOCID",docId);
 			Uri docUriTree = DocumentsContract.buildDocumentUriUsingTree(uri, docId);
 			//Log.d("DOCID",docUriTree.toString());
 			String r = getDataColumn(context, docUriTree, null, null);
