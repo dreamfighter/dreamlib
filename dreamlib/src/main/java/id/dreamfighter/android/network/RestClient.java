@@ -226,7 +226,7 @@ public class RestClient {
 
             String requestLog = String.format("Sending request %s: %s on %s%n%s",request.method(), request.url(), chain.connection(), request.header("Authorization"));
 
-            Log.d("Retrofit",requestLog);
+            //Log.d("Retrofit",requestLog);
 
             Response originalResponse = chain.proceed(request);
 
@@ -290,7 +290,7 @@ public class RestClient {
 
             String requestLog = String.format("Sending request %s: %s on %s%n%s",request.method(), request.url(), chain.connection(), request.header("Authorization"));
 
-            Log.d("Retrofit",requestLog);
+            //Log.d("Retrofit",requestLog);
 
             Response originalResponse = chain.proceed(request);
 

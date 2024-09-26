@@ -4,7 +4,6 @@ buildscript {
     }
     ext.localProperties.load(new FileInputStream(rootProject.file("local.properties")))
     repositories {
-        jcenter()
         mavenCentral()
         google()
         maven {
@@ -12,7 +11,7 @@ buildscript {
         }
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:4.2.0'
+        classpath 'com.android.tools.build:gradle:4.2.2'
         classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7.3'
     }
 }
@@ -20,8 +19,11 @@ buildscript {
 
 allprojects {
     repositories {
+        mavenCentral()
         google()
-        jcenter()
+        maven {
+            url "https://jcenter.bintray.com"
+        }
     }
 }
 

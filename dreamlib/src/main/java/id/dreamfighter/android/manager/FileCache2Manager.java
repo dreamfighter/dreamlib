@@ -153,7 +153,7 @@ public class FileCache2Manager {
                     .subscribeOn(Schedulers.io())
                     .flatMap(o -> {
 
-                        Log.d("Content-Type",contentType + "----" + o.headers().get("content-type"));
+                        //Log.d("Content-Type",contentType + "----" + o.headers().get("content-type"));
                         if(contentType!=null && o!=null && o.headers()!=null && !contentType.equals(o.headers().get("content-type"))){
                             throw new Exception("Content do not Match");
                         }

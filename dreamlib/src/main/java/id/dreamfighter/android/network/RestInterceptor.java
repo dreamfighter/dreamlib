@@ -45,9 +45,9 @@ class RestInterceptor implements Interceptor {
 
 
         //Log.d(TAG," --- start response--- " + t1);
-        Log.d(TAG,"request : "+requestLog);
-        Log.d(TAG,"response: "+responseLog);
-        Log.d(TAG,"Content : "+bodyString);
+        //Log.d(TAG,"request : "+requestLog);
+        //Log.d(TAG,"response: "+responseLog);
+        //Log.d(TAG,"Content : "+bodyString);
 
         //Log.d(TAG," --- end response---");
 
