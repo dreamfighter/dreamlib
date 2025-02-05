@@ -24,6 +24,7 @@ import androidx.documentfile.provider.DocumentFile;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -293,10 +294,21 @@ public class FileUtils {
 						}
 						if (uri!=null) {
 							DocumentFile pickedDir = DocumentFile.fromTreeUri(context, uri);
-							DocumentFile file = pickedDir.findFile(f.getName());
-							if(file==null) {
-								file = pickedDir.createFile("*/*", f.getName());
+							//DocumentFile file = pickedDir.findFile(f.getName());
+							Uri fileUri = getFileFromTreeUri(pickedDir.getUri(),f);
+							boolean isFile = DocumentFile.isDocumentUri(context, fileUri);
+
+							if(isFile){
+								try {
+									DocumentsContract.deleteDocument(context.getContentResolver(), fileUri);
+								} catch (FileNotFoundException e) {
+									Log.d("ERROR","err:"+e.getMessage());
+								}
 							}
+							//if(file==null) {
+							DocumentFile file = pickedDir.createFile("*/*", f.getName());
+							//Log.d("DocumentFile",file.getUri().toString());
+							//}
 
 							outputStream = context.getContentResolver().openOutputStream( file.getUri(), "w");
 						}
@@ -565,5 +577,50 @@ public class FileUtils {
 	 */
 	public static boolean isMediaDocument(Uri uri) {
 		return "com.android.providers.media.documents".equals(uri.getAuthority());
+	}
+
+	@RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+	public static Uri getFileUri(Context context, String fileName) {
+		File f = new File(fileName);
+		String dir = CommonUtils.getRealDirectory(context);
+		File realFile = new File(dir, f.getName());
+		//InputStream inputStream = null;
+
+		//try {
+		String uriStr = CommonUtils.getBaseUri(context);
+		List<UriPermission> permissions = context.getContentResolver().getPersistedUriPermissions();
+		Uri uri = null;
+
+		for (UriPermission p : permissions) {
+			if (uriStr != null && uriStr.equals(p.getUri().toString())) {
+				uri = p.getUri();
+				break;
+			}
+		}
+
+		if (uri != null) {
+			DocumentFile pickedDir = DocumentFile.fromTreeUri(context, uri);
+			if(pickedDir!=null) {
+				return getFileFromTreeUri(pickedDir.getUri(),realFile);
+			}
+		}
+
+		FileProvider.getUriForFile(context, context.getPackageName() + ".provider", realFile);
+		return Uri.fromFile(realFile);
+	}
+
+	@RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+    public static Uri getFileFromTreeUri(Uri treeUri, File file){
+		// Get the directory URI from the persisted tree URI
+		//Uri directoryUri = DocumentsContract.buildDocumentUriUsingTree(treeUri, DocumentsContract.getTreeDocumentId(treeUri));
+
+		//String[] docIds = treeUri.getPath().split("/document/");
+		//Uri contentParent = DocumentFile.fromFile(new File("/tree/primary:Documents/document/primary:Documents/DQ_003.png")).getUri();
+		//DocumentFile contentParent = DocumentFile.fromSingleUri(context,Uri.parse("/tree/primary:dq/document/primary:dq/DQ_003.png"));// DocumentsContract.buildDocumentUri(context.getPackageName() + ".provider","/tree/primary:Documents/document/primary:Documents/DQ_003.png");
+		String docId = DocumentsContract.getDocumentId(treeUri);
+		//Uri contentUriDoc = DocumentsContract.buildDocumentUri(context.getPackageName() + ".provider",docId);
+
+		return DocumentsContract.buildDocumentUriUsingTree(treeUri,docId+ "/" + file.getName());
+
 	}
 }

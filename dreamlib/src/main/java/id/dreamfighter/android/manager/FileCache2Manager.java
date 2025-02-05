@@ -19,6 +19,7 @@ import id.dreamfighter.android.utils.CommonUtils;
 import id.dreamfighter.android.utils.FileUtils;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import okhttp3.ResponseBody;
 import retrofit2.Response;
@@ -149,46 +150,46 @@ public class FileCache2Manager {
 
             fileCaches.put(obj,obverable);
 
-            obverable
+            Disposable contentDoNotMatch = obverable
                     .subscribeOn(Schedulers.io())
                     .flatMap(o -> {
 
                         //Log.d("Content-Type",contentType + "----" + o.headers().get("content-type"));
-                        if(contentType!=null && o!=null && o.headers()!=null && !contentType.equals(o.headers().get("content-type"))){
+                        if (contentType != null && o != null && o.headers() != null && !contentType.equals(o.headers().get("content-type"))) {
                             throw new Exception("Content do not Match");
                         }
                         return Observable.just(o);
                     })
-                    .flatMap(o -> FileUtils.fileObservable(context,o,fullName))
+                    .flatMap(o -> FileUtils.fileObservable(context, o, fullName))
                     .observeOn(AndroidSchedulers.mainThread())
                     //.subscribeOn(AndroidSchedulers.mainThread())
                     .subscribe(f -> {
                         FileCacheManager.FileLoaderListener listener = cacheListener.get(obj);
-                        state.put(fileName,LOADED);
+                        state.put(fileName, LOADED);
 
-                        if(listener!=null){
-                            listener.onLoaded(obj,f,new Date().getTime());
+                        if (listener != null) {
+                            listener.onLoaded(obj, f, new Date().getTime());
                         }
                         fileCaches.remove(obj);
                         cacheListener.remove(obj);
                         FileRequest fileRequest = linkedQueue.poll();
-                        if(fileRequest!=null){
-                            request((int)fileRequest.obj, fileRequest.url, fileRequest.filename,refresh);
+                        if (fileRequest != null) {
+                            request((int) fileRequest.obj, fileRequest.url, fileRequest.filename, refresh);
                         }
-            },throwable -> {
-                        throwable.printStackTrace();
-                FileCacheManager.FileLoaderListener listener = cacheListener.get(obj);
-                if(listener!=null){
-                    listener.onLoadFailed(obj,throwable.getMessage());
-                }
-                state.put(fileName,FAILED);
-                fileCaches.remove(obj);
-                cacheListener.remove(obj);
-                FileRequest fileRequest = linkedQueue.poll();
-                if(fileRequest!=null){
-                    request((int)fileRequest.obj, fileRequest.url, fileRequest.filename,refresh);
-                }
-            });
+                    }, throwable -> {
+                        Log.d("ERROR","err:"+throwable.getMessage());
+                        FileCacheManager.FileLoaderListener listener = cacheListener.get(obj);
+                        if (listener != null) {
+                            listener.onLoadFailed(obj, throwable.getMessage());
+                        }
+                        state.put(fileName, FAILED);
+                        fileCaches.remove(obj);
+                        cacheListener.remove(obj);
+                        FileRequest fileRequest = linkedQueue.poll();
+                        if (fileRequest != null) {
+                            request((int) fileRequest.obj, fileRequest.url, fileRequest.filename, refresh);
+                        }
+                    });
         }else{
             linkedQueue.add(new FileRequest(obj,url,dirStr,fileName,refresh));
         }
