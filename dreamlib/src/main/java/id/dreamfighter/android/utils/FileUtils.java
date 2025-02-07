@@ -296,14 +296,17 @@ public class FileUtils {
 							DocumentFile pickedDir = DocumentFile.fromTreeUri(context, uri);
 							//DocumentFile file = pickedDir.findFile(f.getName());
 							Uri fileUri = getFileFromTreeUri(pickedDir.getUri(),f);
-							boolean isFile = DocumentFile.isDocumentUri(context, fileUri);
+							try {
+								DocumentFile fictionalFile = DocumentFile.fromSingleUri(context, fileUri);
+								//boolean isFile = DocumentFile.isDocumentUri(context, fileUri);
 
-							if(isFile){
-								try {
+								if(fictionalFile!=null && fictionalFile.exists()){
 									DocumentsContract.deleteDocument(context.getContentResolver(), fileUri);
-								} catch (FileNotFoundException e) {
-									Log.d("ERROR","err:"+e.getMessage());
 								}
+							} catch (FileNotFoundException e) {
+								Log.d("ERROR","err:"+e.getMessage());
+							} catch (Exception e) {
+								Log.d("ERROR","err:"+e.getMessage());
 							}
 							//if(file==null) {
 							DocumentFile file = pickedDir.createFile("*/*", f.getName());
