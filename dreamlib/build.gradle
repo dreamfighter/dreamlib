@@ -4,6 +4,7 @@ plugins {
 }
 
 android {
+    namespace "id.dreamfighter.android"
     compileSdkVersion 34
     lintOptions {
         abortOnError false

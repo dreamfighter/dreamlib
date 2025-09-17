@@ -4,14 +4,15 @@ buildscript {
     }
     ext.localProperties.load(new FileInputStream(rootProject.file("local.properties")))
     repositories {
+        gradlePluginPortal()
         mavenCentral()
         google()
-        maven {
-            url "https://jcenter.bintray.com"
-        }
+        maven { url 'https://jitpack.io' }
+        maven { url "https://repo.grails.org/grails/core/" }
+        maven { url "https://groovy.jfrog.io/artifactory/plugins-release/"}
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:4.2.2'
+        classpath 'com.android.tools.build:gradle:8.12.3'
         classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7.3'
     }
 }
@@ -19,11 +20,12 @@ buildscript {
 
 allprojects {
     repositories {
+        gradlePluginPortal()
         mavenCentral()
         google()
-        maven {
-            url "https://jcenter.bintray.com"
-        }
+        maven { url 'https://jitpack.io' }
+        maven { url "https://repo.grails.org/grails/core/" }
+        maven { url "https://groovy.jfrog.io/artifactory/plugins-release/"}
     }
 }
 
