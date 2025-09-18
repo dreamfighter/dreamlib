@@ -14,6 +14,7 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
+import okhttp3.tls.HandshakeCertificates;
 import okio.Buffer;
 import okio.BufferedSource;
 import okio.ForwardingSource;
@@ -338,13 +339,16 @@ public class RestClient {
     }
 
     public static <T> T raw(Class<T> clazz) {
-        return raw(clazz,null);
+        return raw(clazz,null,null);
     }
 
-    public static <T> T raw(Class<T> clazz,final ProgressListener listener) {
+    public static <T> T raw(Class<T> clazz, final ProgressListener listener, HandshakeCertificates certificates) {
 
         // Add the interceptor to OkHttpClient
         OkHttpClient.Builder builder = new OkHttpClient.Builder();
+        if(certificates!=null) {
+            builder.sslSocketFactory(certificates.sslSocketFactory(),certificates.trustManager());
+        }
         builder.addInterceptor(chain -> {
             Request original = chain.request();
             Request.Builder b = original.newBuilder();

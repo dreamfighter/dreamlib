@@ -1,8 +1,6 @@
 package id.dreamfighter.android.manager;
 
 import android.content.Context;
-import android.net.Uri;
-import android.os.Build;
 import android.os.Handler;
 import android.util.Log;
 
@@ -22,6 +20,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import okhttp3.ResponseBody;
+import okhttp3.tls.HandshakeCertificates;
 import retrofit2.Response;
 
 /**
@@ -41,6 +40,7 @@ public class FileCache2Manager {
 
     private Map<Object, Observable> fileCaches = new HashMap<>();
     private Map<Object,FileCacheManager.FileLoaderListener> cacheListener = new ConcurrentHashMap<Object,FileCacheManager.FileLoaderListener>();
+    private HandshakeCertificates certificates;
     //private FileCacheManager.FileLoaderListener listener;
 
     public class FileRequest{
@@ -74,6 +74,10 @@ public class FileCache2Manager {
 
     public void setTimeout(int timeout) {
         this.timeout = timeout;
+    }
+
+    public void setCertificates(HandshakeCertificates certificates){
+        this.certificates = certificates;
     }
 
     public FileCache2Manager addListener(Object obj, FileCacheManager.FileLoaderListener listener){
@@ -146,7 +150,7 @@ public class FileCache2Manager {
                     }
                 });
 
-            }).get(url);
+            },certificates).get(url);
 
             fileCaches.put(obj,obverable);
 

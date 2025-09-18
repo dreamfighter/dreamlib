@@ -403,7 +403,7 @@ public class CommonUtils {
 
 
     public static int getActionBarHeight(Context context){
-        int[] textSizeAttr = new int[] { android.R.attr.actionBarSize, R.attr.actionBarSize };
+        int[] textSizeAttr = new int[] { android.R.attr.actionBarSize };
         TypedArray a = context.obtainStyledAttributes(new TypedValue().data, textSizeAttr);
         int heightHolo = a.getDimensionPixelSize(0, -1);
         int heightMaterial = a.getDimensionPixelSize(1, -1);

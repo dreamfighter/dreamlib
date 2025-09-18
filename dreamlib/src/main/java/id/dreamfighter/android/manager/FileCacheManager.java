@@ -12,6 +12,7 @@ import id.dreamfighter.android.utils.CommonUtils;
 import id.dreamfighter.android.utils.FileUtils;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
+import okhttp3.tls.HandshakeCertificates;
 
 /**
  * this cache time to live is in milisecond
@@ -30,6 +31,7 @@ public class FileCacheManager{
     private CacheListener cacheListener;
     private FileRequest currImgRequest = null;
     private Object currentDisplay = new Object();
+    private HandshakeCertificates certificates;
 
 
     public class FileRequest{
@@ -149,8 +151,6 @@ public class FileCacheManager{
             this.currentDisplay = obj;
         }
 
-
-
         if(linkedQueue.isEmpty()){
             currImgRequest = new FileRequest(obj, url, dir, filename);
             //this.requestManager.setFilename(fullname);
@@ -165,7 +165,7 @@ public class FileCacheManager{
                     }
                 });
 
-            }).get(url)
+            },certificates).get(url)
                     .subscribeOn(Schedulers.io())
                     .observeOn(Schedulers.io())
                     .flatMap(o -> FileUtils.fileObservable(context,o,fullname))
@@ -243,6 +243,10 @@ public class FileCacheManager{
 
     public void setRefresh(boolean refresh) {
         this.refresh = refresh;
+    }
+
+    public void setCertificates(HandshakeCertificates certificates){
+        this.certificates = certificates;
     }
 
 }

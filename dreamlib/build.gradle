@@ -5,13 +5,13 @@ plugins {
 
 android {
     namespace "id.dreamfighter.android"
-    compileSdkVersion 34
+    compileSdk 34
     lintOptions {
         abortOnError false
     }
     defaultConfig {
         minSdkVersion 16
-        targetSdkVersion 34
+        targetSdk 34
         versionCode 1
         versionName "3.0.17"
     }
@@ -53,6 +53,7 @@ dependencies {
     implementation 'com.squareup.retrofit2:retrofit:2.5.0'
     implementation 'com.squareup.retrofit2:adapter-rxjava2:2.4.0'
     implementation 'com.squareup.okhttp3:okhttp:3.12.12'
+    implementation 'com.squareup.okhttp3:okhttp-tls:4.12.0'
     implementation 'com.squareup.retrofit2:converter-jackson:2.1.0'
 
     // RxJava
@@ -92,5 +93,10 @@ publishing {
 
             }
         }
+    }
+}
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
     }
 }
